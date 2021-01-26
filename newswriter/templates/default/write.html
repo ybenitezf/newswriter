@@ -1,0 +1,54 @@
+{% extends 'layout_full.html' %}
+
+{% block page_title %}{{'Escribir - Redacción' if article is none else article.headline}}{% endblock %}
+
+{% block content %}
+<div data-controller="editor"
+    data-editor-author-value="{{ current_user.name }}"
+    data-editor-apiendpoint-value="{{ url_for('default.articleEndPoint', pkid=pkid) }}"
+    data-editor-imageupload-value="{{ url_for('default.upload_image', _external=True) }}"
+    data-editor-imagefetchurl-value="{{ url_for('default.fetch_image', _external=True) }}"
+    data-editor-linkendpoint-value="{{ url_for('default.fetch_link', _external=True) }}">
+
+    <div class="container">
+      <div class="row">
+        <div class="input-field col s12">
+          <input data-editor-target="headline" type="text" placeholder="Título"/>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field  col s6">
+          <input type="text" data-editor-target="creditline" value=""/>
+        </div>
+        <div class="col s6">
+          <div class="chips chips-placeholder" data-editor-target="tags"></div>
+          <span class="helper-text" data-error="wrong" data-success="right">
+            Ingrese la palabra clave y presione <code class="grey darken-3 white-text p-1">enter</code>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="editorContent" data-editor-target="content" class="browser-default-uls flow-text mt-5">
+    </div>
+
+    <div class="fixed-action-btn editor-tool-box" data-editor-target="toolbox">
+      <a class="btn-floating btn-large disabled" data-action="editor#guardar" title="Guardar">
+        <i class="large material-icons">save</i>
+      </a>
+      <ul>
+        <li><a class="btn-floating red darken-2" title="Borrar"><i class="material-icons">delete</i></a></li>
+        <li><a class="btn-floating" title="Vista previa"><i class="material-icons">pageview</i></a></li>
+        <li><a class="btn-floating" title="Enviar"><i class="material-icons">send</i></a></li>
+      </ul>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block page_js %}
+<script src="{{ static_url_for('static', filename='js/editorcomp.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% for navbarentry in current_menu.submenu("navbar").children %}
+    {% if navbarentry.children %}
+        {% for menu_item in  navbarentry.children %}
+        {% if menu_item.visible %}
+            {% if menu_item.dynamic_list %}
+            <li class="{{ 'active' if menu_item.active else '' }}">
+                <a href="{{ menu_item.dynamic_list[0].url }}">{{ menu_item.dynamic_list[0].text|safe }}</a>
+            </li>
+            {% else %}
+            <li class="{{ 'active' if menu_item.active else '' }}">
+                <a href="{{ menu_item.url }}">{{ menu_item.text|safe }}</a>
+            </li>
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+    {%  endif %}
+{% endfor %}

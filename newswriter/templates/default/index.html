@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}Mis trabajos{% endblock %}
+
+{% block content %}
+<div class="works-list px-5">
+
+    {% if results.items: %}
+
+    {% for item in results.items: %}
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">{{ item.headline }}</span>
+        <p class="work-excerpt px-4">
+          {% if item.excerpt %}
+            {{ item.excerpt | striptags | truncate(140) }}
+          {% else %}
+            {{ item.getFirstTextBlock() | striptags | truncate(140) }}
+          {% endif %}
+        </p>
+      </div>
+      <div class="card-action">
+          <a href="{{ url_for('default.write', pkid=item.id) }}">Editar</a>
+          <a href="#">Ver</a>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="center-align mt-5">
+      <a href="{{ '#!' if results.has_prev is false else url_for('.index', page=results.prev_num)}}" class="waves-effect waves-light btn {{ 'disabled' if results.has_prev is false else ''}}"><i class="material-icons left">chevron_left</i> Anterior</a>
+      <a href="{{ '#!' if results.has_next is false else url_for('.index', page=results.next_num)}}" class="waves-effect waves-light btn ml-5 {{ 'disabled' if results.has_next is false else ''}}">Siguiente <i class="material-icons right">chevron_right</i></a>
+    </div>
+    {% else %}
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title center-align">
+          No se encontró ningún artículo
+        </span>
+        <div class="card-action">
+          <a href="{{ url_for('default.write') }}">Escribir uno</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
