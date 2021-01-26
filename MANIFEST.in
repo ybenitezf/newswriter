@@ -1,0 +1,5 @@
+include requirements.txt
+graft migrations
+graft newswriter/static
+graft newswriter/templates
+global-exclude *.pyc
