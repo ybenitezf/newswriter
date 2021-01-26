@@ -1,0 +1,54 @@
+$photocoverage-elements: 'headline', 'excerpt', 'photos', 'keywords', 'creditline', 'archivedon';
+
+@each $c in $photocoverage-elements {
+    .photocoverage-#{$c} {
+        margin-top: 1.2rem;
+        margin-bottom: 1.2rem;
+    }
+}
+
+.photocoverage-excerpt {
+  p {
+    font-size: 110%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+.gallery--row {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0px;
+}
+
+.gallery--col {
+  flex: 33.3%;
+  max-width: 33.3%;
+  padding: 0 .3rem;
+
+  .card {
+    margin: 4px;
+    vertical-align: middle;
+    box-shadow: none;
+    padding: .3rem;
+    border-radius: 0px;
+
+    &:hover {
+      border: $primary-color-light 1px solid;
+    }
+
+    .card-action {
+      padding: 0.2rem 0.4rem;
+    }
+
+    .card-reveal {
+      p {
+        display: block;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+      }
+    }
+  }
+}

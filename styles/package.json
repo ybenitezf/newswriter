@@ -1,0 +1,17 @@
+{
+  "name": "styles",
+  "version": "1.0.0",
+  "description": "Estilos para sitio de redaccion",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "sass base.scss ../application/static/css/style.css && sass utils.scss ../application/static/css/utils.css"
+  },
+  "author": "Yoel Benitez Fonseca <ybenitezf@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^4.5.3",
+    "material-icons": "^0.3.1",
+    "materialize-css": "^1.0.0-rc.2"
+  }
+}

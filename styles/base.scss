@@ -1,0 +1,108 @@
+@import "node_modules/materialize-css/sass/components/color-variables";
+
+$primary-color: color("blue-grey", "darken-3") !default;
+$primary-color-light: false !default;
+$primary-color-dark: false !default;
+@if not $primary-color-light {
+  $primary-color-light: lighten($primary-color, 15%);
+}
+@if not $primary-color-dark {
+  $primary-color-dark: darken($primary-color, 15%);
+}
+$secondary-color: color("blue-grey", "darken-1") !default;
+$success-color: color("green", "base") !default;
+$error-color: color("red", "base") !default;
+
+$chip-selected-color: color("blue-grey", "lighten-2") !default;
+
+// $link-color: color("blue", "darken-4") !default;
+@import "node_modules/materialize-css/sass/components/variables";
+
+.flow-text{
+  $i: 0;
+  @while $i <= $intervals {
+    @media only screen and (min-width : 360 + ($i * $interval-size)) {
+      font-size: 1.1rem * (1 + (.02 * $i)) !important; 
+    }
+    $i: $i + 1;
+  }
+
+  // Handle below 360px screen
+  @media only screen and (max-width: 360px) {
+    font-size: 1.2rem;
+  }
+}
+
+@import "node_modules/materialize-css/sass/materialize.scss";
+
+
+// reset to material
+@import "node_modules/material-icons/iconfont/material-icons.scss";
+
+.icon-block {
+    padding: 0 15px;
+}
+
+.icon-block .material-icons {
+    font-size: inherit;
+}
+  
+// html {
+//     font-size: 16px;
+// }
+
+main {
+    min-height: 100vh;
+}
+
+
+.browser-default-uls {
+  ul {
+    padding-left: 30px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    li {
+      list-style-type: disc!important;
+      ul {
+        li {list-style-type: circle!important;}
+      }
+    }
+  }
+
+  ul.cdx-list--ordered {
+    padding-left: 30px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+
+    li {
+      list-style-type: decimal!important;
+      ul.cdx-list--ordered {
+        li {list-style-type: decimal!important;}
+      }
+    }
+  }
+}
+
+
+.exiftag {
+  display: inline-block;
+  height: 32px;
+  font-size: 14px;
+  font-weight: 500;
+  // color: rgba(0,0,0,.6);
+  line-height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  margin-bottom: $chip-margin;
+  margin-right: $chip-margin;
+
+  .exificon {
+    float: left;
+    font-size: 16px;
+    line-height: 32px;
+    padding-right: 8px;
+  }
+}
+
+
+@import 'photocoverage.scss';
