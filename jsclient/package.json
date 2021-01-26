@@ -1,0 +1,50 @@
+{
+  "name": "jsclient",
+  "version": "1.0.0",
+  "description": "Utilidades de JS para adlgestion",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch --mode=development",
+    "build": "webpack --mode=production",
+    "images": "cd node_modules/@editorjs/image && yarn install && yarn build"
+  },
+  "keywords": [
+    "adelante",
+    "adlgestion"
+  ],
+  "author": "Yoel Benitez Fonseca",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@editorjs/delimiter": "^1.1.0",
+    "@editorjs/header": "^2.4.0",
+    "@editorjs/link": "^2.3.1",
+    "@editorjs/list": "^1.4.0",
+    "@editorjs/paragraph": "^2.6.1",
+    "@editorjs/quote": "^2.3.0",
+    "@editorjs/raw": "^2.3.0",
+    "@editorjs/warning": "file:warning",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^5.0.1",
+    "path": "^0.12.7",
+    "style-loader": "^2.0.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@editorjs/editorjs": "2.19.0",
+    "@editorjs/image": "ybenitezf/image",
+    "@uppy/core": "^1.14.1",
+    "@uppy/dashboard": "^1.13.0",
+    "@uppy/locales": "^1.16.10",
+    "@uppy/xhr-upload": "^1.6.7",
+    "axios": "^0.19.2",
+    "codex-notifier": "^1.1.2",
+    "moment": "^2.29.1",
+    "stimulus": "^2.0.0",
+    "validate.js": "^0.13.1"
+  }
+}
