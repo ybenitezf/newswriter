@@ -85,52 +85,53 @@ def create_app(config='newswriter.config.Config'):
         init_celery(celery, app)
 
     # incluir modulos y rutas
-    with app.app_context():
-        from .views.default import default
-        from .views.users import users_bp
-        from .searchcommands import cmd as search_cmd
-        from .admin_commands import users_cmds
-        from .views.admin import MyAdminIndexView, UserView
-        from .views.admin import RoleView, PermissionView
-        from .views.admin import BoardsAdminView, ArticleAdminView
+    from newswriter.views.default import default
+    from newswriter.views.users import users_bp
+    from newswriter.searchcommands import cmd as search_cmd
+    from newswriter.admin_commands import users_cmds
+    from adelacommon.deploy import deploy_cmd
+    from newswriter.views.admin import MyAdminIndexView, UserView
+    from newswriter.views.admin import RoleView, PermissionView
+    from newswriter.views.admin import BoardsAdminView, ArticleAdminView
 
-        admon.init_app(app, index_view=MyAdminIndexView())
-        # registrar los blueprints
-        app.register_blueprint(default)
-        app.register_blueprint(users_bp)
-        app.register_blueprint(search_cmd)
-        app.register_blueprint(users_cmds)
-        login_mgr.login_view = 'users.login'
+    admon.init_app(app, index_view=MyAdminIndexView())
+    # registrar los blueprints
+    app.register_blueprint(default)
+    app.register_blueprint(users_bp)
+    app.register_blueprint(search_cmd)
+    app.register_blueprint(users_cmds)
+    app.register_blueprint(deploy_cmd)
+    login_mgr.login_view = 'users.login'
 
-        # admon views 
-        admon.add_views(UserView(), RoleView(), PermissionView())
-        admon.add_views(ArticleAdminView(), BoardsAdminView())
+    # admon views 
+    admon.add_views(UserView(), RoleView(), PermissionView())
+    admon.add_views(ArticleAdminView(), BoardsAdminView())
 
-        # the dummy thing
-        @app.route("/")
-        @register_breadcrumb(app, '.', "Inicio")
-        @register_menu(app, '.', "Inicio")
-        def home():
-            """Registrar una raiz commun para los breadcrumbs"""
-            return redirect(url_for('default.index'))
+    # the dummy thing
+    @app.route("/")
+    @register_breadcrumb(app, '.', "Inicio")
+    @register_menu(app, '.', "Inicio")
+    def home():
+        """Registrar una raiz commun para los breadcrumbs"""
+        return redirect(url_for('default.index'))
 
-        @app.before_first_request
-        def setupMenus():
-            """Crear las entradas virtuales del menu"""
-            m = menu.root()
+    @app.before_first_request
+    def setupMenus():
+        """Crear las entradas virtuales del menu"""
+        m = menu.root()
 
-            # navbar para el menu principal de la app
-            navbar = m.submenu("navbar")
-            navbar._external_url = "#!"
-            navbar._endpoint = None
-            navbar._text = "NAVBAR"
+        # navbar para el menu principal de la app
+        navbar = m.submenu("navbar")
+        navbar._external_url = "#!"
+        navbar._endpoint = None
+        navbar._text = "NAVBAR"
 
-            # actions, para el sidebar, registrar submenus debajo
-            # de este menu
-            actions = m.submenu("actions")
-            actions._external_url = "#!"
-            actions._endpoint = None
-            actions._text = "NAVBAR"
+        # actions, para el sidebar, registrar submenus debajo
+        # de este menu
+        actions = m.submenu("actions")
+        actions._external_url = "#!"
+        actions._endpoint = None
+        actions._text = "NAVBAR"
 
     return app
 
