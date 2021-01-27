@@ -19,7 +19,7 @@ setup(
     license='GPL',
     author='Yoel Benítez Fonseca',
     author_email='ybenitezf@gmail.com',
-    description='Modulos y librerias comunes para aldenate.cu',
+    description='News redactor for adelante.cu',
     long_description=read('README.md'),
     packages=find_packages(),
     include_package_data=True,
