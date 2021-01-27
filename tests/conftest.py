@@ -1,9 +1,9 @@
 import pytest
-from photostore import create_app, db
+from newswriter import create_app, db
 
 @pytest.fixture
 def app():
-    app = create_app('config.TestConfig')
+    app = create_app('newswriter.config.TestConfig')
 
     with app.app_context():
         db.create_all()
