@@ -2,11 +2,9 @@ from newswriter.models.security import Role, User, create_user as CreateUser
 from newswriter.shemas import UserSchema, RoleSchema
 from newswriter import db
 from flask import Blueprint
-from flask.cli import cli
 from pprint import pprint
 import click
 
-admin_cmds = Blueprint("admin", __name__)
 users_cmds = Blueprint("security", __name__)
 
 
