@@ -15,6 +15,7 @@ from apifairy import APIFairy
 from flask_marshmallow import Marshmallow
 from celery import Celery
 from flask import Flask, redirect
+from werkzeug.middleware.proxy_fix import ProxyFix
 import pathlib
 import os
 
@@ -61,12 +62,9 @@ def create_app(config='newswriter.config.Config'):
             parents=True, exist_ok=True)
     logs.init_app(app)
 
-    if app.config.get('ENV') != 'development':
-        from werkzeug.middleware.proxy_fix import ProxyFix
-
-        app.wsgi_app = ProxyFix(
-            app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, 
-            x_prefix=1)
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, 
+        x_prefix=1)
 
     # inicializar otros plugins
     db.init_app(app)
