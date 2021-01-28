@@ -55,7 +55,7 @@ setup(
         'marshmallow-sqlalchemy',
         'celery',
         'Whoosh',
-        'adelacommon @ https://github.com/ybenitezf/adela-common/tarball/master'
+        'adelacommon @ https://github.com/ybenitezf/adela-common/archive/v0.0.2.tar.gz'
     ],
     classifiers=[
         'Environment :: Web Environment', 
