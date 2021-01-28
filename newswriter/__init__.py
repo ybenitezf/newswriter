@@ -1,4 +1,5 @@
-from newswriter.modules.flask_logs import LogSetup
+from adelacommon.flask_logs import LogSetup
+from adelacommon.deploy import deploy_cmd
 from flask.helpers import url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -89,7 +90,6 @@ def create_app(config='newswriter.config.Config'):
     from newswriter.views.users import users_bp
     from newswriter.searchcommands import cmd as search_cmd
     from newswriter.admin_commands import users_cmds
-    from adelacommon.deploy import deploy_cmd
     from newswriter.views.admin import MyAdminIndexView, UserView
     from newswriter.views.admin import RoleView, PermissionView
     from newswriter.views.admin import BoardsAdminView, ArticleAdminView
