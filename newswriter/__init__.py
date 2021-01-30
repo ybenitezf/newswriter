@@ -74,7 +74,6 @@ def create_app(config='newswriter.config.Config'):
     if app.config.get('LDAP_AUTH'):
         ldap_mgr.init_app(app)
     principal.init_app(app)
-    # devtoolbar.init_app(app)
     cache.init_app(app)
     flask_statics.init_app(app)
     ma.init_app(app)

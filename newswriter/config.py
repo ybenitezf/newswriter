@@ -34,11 +34,6 @@ class Config(object):
     # --
     DEBUG_TB_INTERCEPT_REDIRECTS = False
 
-    # blueprints
-    PHOTOSTORE_ENABLED = True
-    DEFAULT_VOL_SIZE = int(os.getenv('DEFAULT_VOL_SIZE', 0)) or 107374182400
-    DEFAULT_MEDIA_SIZE = int(os.getenv('DEFAULT_MEDIA_SIZE', 0)) or 4831838208
-    # --
     CELERY_ENABLED = (os.getenv('CELERY_ENABLED', 'False') == 'True')
     broker_url = os.getenv('CELERY_BROKER_URL') or 'redis://localhost:6379'
     result_backend = os.getenv('CELERY_RESULT_BACKEND') or None
