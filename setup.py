@@ -31,7 +31,7 @@ setup(
         'pytest-cov'
     ],
     install_requires=[
-        'Flask',
+        'wheel',
         'Flask-Migrate',
         'Flask-SQLAlchemy',
         'Flask-Login',
@@ -43,6 +43,7 @@ setup(
         'Flask-Principal',
         'Flask-Caching',
         'Flask-Static-Digest',
+        'Flask',
         'email-validator',
         'PyMySQL',
         'python-dotenv',

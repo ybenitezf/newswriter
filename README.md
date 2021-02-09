@@ -4,6 +4,8 @@ A news redaction app for adelante.cu
 
 ## development
 
+You need `yarn` and `node >= 12`
+
 ```bash
 git clone https://github.com/ybenitezf/newswriter
 cd newswriter

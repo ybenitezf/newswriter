@@ -69,6 +69,7 @@ statics: ## Build statics
 	cd styles && yarn run build && cd ..
 	flask digest compile
 
-dev: clean ## setup development enviroment
+dev: ## setup development enviroment
 	python -m pip install -e .
+	@$(MAKE) -f $(THIS_FILE) clean
 	@$(MAKE) -f $(THIS_FILE) statics
