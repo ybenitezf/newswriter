@@ -8,23 +8,24 @@ A news redaction app for adelante.cu
 git clone https://github.com/ybenitezf/newswriter
 cd newswriter
 python3 -m venv env
-. env/bin/activate
-pip install -e .
+make dev
 ```
 
 ## tests
 
 ```bash
-python setup.py test
+make test
 ```
 
 Or with coverage
 
 ```bash
-python setup.py test --addopts --cov
+make coverage
 ```
 
 ## Install
+
+TODO: review
 
 ```bash
 pip install https://github.com/ybenitezf/newswriter/archive/master.tar.gz
