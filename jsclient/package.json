@@ -29,6 +29,8 @@
     "css-loader": "^5.0.1",
     "path": "^0.12.7",
     "style-loader": "^2.0.0",
+    "html-webpack-plugin": "^4.5.1",
+    "html-webpack-template": "^6.2.0",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11"
   },

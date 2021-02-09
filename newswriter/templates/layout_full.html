@@ -64,7 +64,7 @@
     <!--  Scripts-->
     <script src="{{ static_url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
     <script src="{{ static_url_for('static', filename='js/materialize.min.js') }}"></script>
-    <!-- <script src="{{ static_url_for('static', filename='js/init.js') }}"></script> -->
+    {% include "jsfiles.html" %}
     {% block page_js %}{% endblock %}
     </body>
 </html>
