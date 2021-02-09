@@ -10,6 +10,7 @@ You need `yarn` and `node >= 12`
 git clone https://github.com/ybenitezf/newswriter
 cd newswriter
 python3 -m venv env
+. env/bin/activate
 make dev
 ```
 
