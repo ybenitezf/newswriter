@@ -144,9 +144,11 @@ cython_debug/
 node_modules/
 .sass-cache/
 *.map
-jsclient/editorjs_link
-jsclient/image
-jsclient/warning
 *-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].*
 *.gz
 cache_manifest.json
+newswriter/static/css/*.css
+newswriter/static/js/vendor*.js
+newswriter/static/js/app.js
+newswriter/static/js/runtime.js
+newswriter/templates/jsfiles.html

@@ -13,7 +13,7 @@ module.exports = {
       photoedit_page: './src/photoedit_page.js'
     },
     output: {
-        path: path.resolve( __dirname, '../application/static/js' ),
+        path: path.resolve( __dirname, '../newswriter/static/js' ),
         filename: '[name].js',
     },
     module: {

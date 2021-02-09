@@ -11,7 +11,7 @@
   },
   "keywords": [
     "adelante",
-    "adlgestion"
+    "newswriter"
   ],
   "author": "Yoel Benitez Fonseca",
   "license": "GPL-3.0-or-later",
@@ -25,7 +25,6 @@
     "@editorjs/paragraph": "^2.6.1",
     "@editorjs/quote": "^2.3.0",
     "@editorjs/raw": "^2.3.0",
-    "@editorjs/warning": "file:warning",
     "babel-loader": "^8.1.0",
     "css-loader": "^5.0.1",
     "path": "^0.12.7",
@@ -37,6 +36,7 @@
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@editorjs/editorjs": "2.19.0",
     "@editorjs/image": "ybenitezf/image",
+    "@editorjs/warning": "^1.2.0",
     "@uppy/core": "^1.14.1",
     "@uppy/dashboard": "^1.13.0",
     "@uppy/locales": "^1.16.10",
