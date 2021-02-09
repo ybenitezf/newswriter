@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "sass base.scss ../application/static/css/style.css && sass utils.scss ../application/static/css/utils.css"
+    "build": "sass base.scss ../newswriter/static/css/style.css && sass utils.scss ../newswriter/static/css/utils.css"
   },
   "author": "Yoel Benitez Fonseca <ybenitezf@gmail.com>",
   "license": "ISC",

@@ -1,0 +1,3 @@
+<% htmlWebpackPlugin.files.js.forEach(function(jsfile) { %>
+    <script src="{{ static_url_for('static', filename='js/<%= jsfile %>') }}"></script>
+<% }); %>
