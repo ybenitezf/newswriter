@@ -1,6 +1,8 @@
 # NewsWriter
 
-A news redaction app for adelante.cu
+A news redaction app for adelante.cu:
+
+![NewsWriter UI](newswriter.png)
 
 ## development
 
