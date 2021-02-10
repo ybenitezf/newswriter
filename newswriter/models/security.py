@@ -81,6 +81,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(254), index=True)
     password_hash = db.Column(db.String(128))
+    credit_line = db.Column(db.String(254), default='')
     roles = db.relationship(
         'Role', secondary=user_roles, lazy='select',
         backref=db.backref('users', lazy=True))
