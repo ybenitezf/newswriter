@@ -1,4 +1,4 @@
-{% extends 'layout_full.html' %}
+{% extends 'layout.html' %}
 
 {% block page_title %}{{'Escribir - Redacción' if article is none else article.headline}}{% endblock %}
 
@@ -10,7 +10,6 @@
     data-editor-imagefetchurl-value="{{ url_for('default.fetch_image', _external=True) }}"
     data-editor-linkendpoint-value="{{ url_for('default.fetch_link', _external=True) }}">
 
-    <div class="container">
       <div class="row">
         <div class="input-field col s12">
           <input data-editor-target="headline" type="text" placeholder="Título"/>
@@ -29,7 +28,6 @@
         </div>
       </div>
 
-    </div>
 
     <div id="editorContent" data-editor-target="content" class="browser-default-uls flow-text mt-5">
     </div>

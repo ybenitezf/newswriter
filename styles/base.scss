@@ -1,6 +1,6 @@
 @import "node_modules/materialize-css/sass/components/color-variables";
 
-$primary-color: color("blue-grey", "darken-3") !default;
+$primary-color: color("indigo", "darken-4") !default;
 $primary-color-light: false !default;
 $primary-color-dark: false !default;
 @if not $primary-color-light {
@@ -9,7 +9,7 @@ $primary-color-dark: false !default;
 @if not $primary-color-dark {
   $primary-color-dark: darken($primary-color, 15%);
 }
-$secondary-color: color("blue-grey", "darken-1") !default;
+$secondary-color: color("blue", "darken-1") !default;
 $success-color: color("green", "base") !default;
 $error-color: color("red", "base") !default;
 

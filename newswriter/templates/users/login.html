@@ -8,27 +8,10 @@
 
         <div class="row">
             <div class="col s12 center-align mt-5">
-                <img src="{{ static_url_for('static', filename='images/logo.png') }}" alt="Logo" height="128">
+                <img src="{{ static_url_for('static', filename='images/logo.png') }}" alt="Logo" height="100">
+                <h3>Redacción</h3>
             </div>
         </div>
-        <!-- <h1 class="center">Entrar <i class="small material-icons">login</i></h1> -->
-
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="row">
-                    <div class="col s10 offset-s1">
-                        <div class="card-panel pink darken-4"> 
-                            <span class="white-text">
-                                {{ message }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-
-        {% endif %}
-        {% endwith %}
 
         <div class="row">
             <form action="" method="POST" novalidate class="col s6 offset-s3" autocomplete="off">

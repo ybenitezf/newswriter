@@ -13,6 +13,15 @@
   {% block htmlhead %}{% endblock %}
 </head>
 <body>
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+      {% for message in messages %}
+      <div class="hide" data-controller="flash">{{ message }}</div>
+      {% endfor %}
+  {% endif %}
+  {% endwith %}
+
   {% block content %}{% endblock %}
   <!--  Scripts-->
   <script src="{{ static_url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
