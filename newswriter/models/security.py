@@ -1,7 +1,6 @@
-from newswriter import db, cache
+from newswriter import db
 from newswriter.models import _gen_uuid
 from flask_login import UserMixin, current_user
-from flask_admin import expose
 from flask_principal import Need, identity_loaded, RoleNeed, UserNeed, ItemNeed
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -9,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 user_roles = db.Table(
     'user_roles',
     db.Column(
-        'user_id', db.String(32), db.ForeignKey('user.id'), 
+        'user_id', db.String(32), db.ForeignKey('user.id'),
         primary_key=True),
     db.Column(
         'role_id', db.String(32), db.ForeignKey('role.id'),
@@ -42,7 +41,7 @@ class Role(db.Model):
             self.query.session.add(self)
 
     @classmethod
-    def getUserEspecialRole(cls, user: 'User') -> 'Role': 
+    def getUserEspecialRole(cls, user: 'User') -> 'Role':
         return cls.query.filter_by(
             name="{}_role".format(user.username)).first()
 
@@ -53,9 +52,9 @@ class Role(db.Model):
 
         if r is None:
             r = Role(
-                    name=rol, 
-                    description="{} role".format(user.username)
-                )
+                name=rol,
+                description="{} role".format(user.username)
+            )
             user.roles.append(r)
             db.session.add(r)
             db.session.add(user)
@@ -70,7 +69,7 @@ class Permission(db.Model):
     # the record id ... empty and the user has access to all record's
     record_id = db.Column(db.String(32))
     # group or role
-    role_id =  db.Column(db.String(32), db.ForeignKey('role.id'))
+    role_id = db.Column(db.String(32), db.ForeignKey('role.id'))
 
     def __repr__(self):
         return "::".join([self.name, self.model_name, self.record_id])
@@ -83,7 +82,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(254), index=True)
     password_hash = db.Column(db.String(128))
     roles = db.relationship(
-        'Role', secondary=user_roles, lazy='select', 
+        'Role', secondary=user_roles, lazy='select',
         backref=db.backref('users', lazy=True))
 
     def getUserRole(self):
@@ -100,14 +99,14 @@ class User(UserMixin, db.Model):
         return '<User {}>'.format(self.email or self.username)
 
 
-def create_user(username:str, password:str, name='', email='') -> User:
+def create_user(username: str, password: str, name='', email='') -> User:
     """Crear un usuario"""
     user = User()
     user.name = name
     user.set_password(password)
     user.username = username
     user.email = email
-    
+
     # crear grupo especial para el usuario
     Role.createUserEspecialRole(user)
 
@@ -136,4 +135,4 @@ def on_identity_loaded(sender, identity):
                 else:
                     # permiso sobre objetos del mismo tipo
                     identity.provides.add(Need(p.name, p.model_name))
-            # -- 
+            # --
