@@ -16,6 +16,14 @@ python3 -m venv env
 make dev
 ```
 
+After changes make a new dist release with:
+
+```bash
+$ bump2version patch # possible: major / minor / patch
+$ git push
+$ git push --tags
+```
+
 ## tests
 
 ```bash
