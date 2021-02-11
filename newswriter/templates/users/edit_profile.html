@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block page_title %}Editar perfil - {{ user.username }}{% endblock %}
+
+{% block content %}
+
+<h1>Editar perfil de <small>{{ user.name or user.username }}</small></h1>
+
+<div class="container">
+    <div class="row">
+        <form action="" method="post" class="col s12" autocomplete="off">
+            {{ form.hidden_tag() }}
+            <!-- name -->
+            <div class="row"> {{ render_field(form.name, 's12') }} </div>
+
+            <!-- email -->
+            <div class="row"> {{ render_field(form.email, 's12') }}</div>
+
+            <!-- creditos -->
+            <div class="row">{{ render_field(form.credit_line, 's12') }}</div>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">
+                        Guardar
+                        <i class="material-icons left">send</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

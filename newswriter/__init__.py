@@ -7,8 +7,7 @@ from flask_ldap3_login import LDAP3LoginManager
 from flask_principal import Principal
 from flask_caching import Cache
 from flask_static_digest import FlaskStaticDigest
-from flask_breadcrumbs import Breadcrumbs, register_breadcrumb
-from flask_menu import register_menu
+from flask_menu import register_menu, Menu
 from apifairy import APIFairy
 from flask_marshmallow import Marshmallow
 from celery import Celery
@@ -28,9 +27,8 @@ flask_statics = FlaskStaticDigest()
 apifairy = APIFairy()
 ma = Marshmallow()
 celery = Celery(__name__)
-crumbs = Breadcrumbs()
 # Breadcrumbs is a subclass of flask_menu.Menu
-menu = crumbs
+menu = Menu()
 
 
 def create_app(config='newswriter.config.Config'):
@@ -75,7 +73,7 @@ def create_app(config='newswriter.config.Config'):
     cache.init_app(app)
     flask_statics.init_app(app)
     ma.init_app(app)
-    crumbs.init_app(app)
+    menu.init_app(app)
     apifairy.init_app(app)
     if app.config.get('CELERY_ENABLED'):
         init_celery(celery, app)
@@ -97,22 +95,15 @@ def create_app(config='newswriter.config.Config'):
 
     # the dummy thing
     @app.route("/")
-    @register_breadcrumb(app, '.', "Inicio")
     @register_menu(app, '.', "Inicio")
     def home():
-        """Registrar una raiz commun para los breadcrumbs"""
+        """Registrar una raiz commun para los menus"""
         return redirect(url_for('default.index'))
 
     @app.before_first_request
     def setupMenus():
         """Crear las entradas virtuales del menu"""
         m = menu.root()
-
-        # navbar para el menu principal de la app
-        navbar = m.submenu("navbar")
-        navbar._external_url = "#!"
-        navbar._endpoint = None
-        navbar._text = "NAVBAR"
 
         # actions, para el sidebar, registrar submenus debajo
         # de este menu

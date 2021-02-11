@@ -2,6 +2,7 @@ from newswriter import db
 from newswriter.models import _gen_uuid
 from flask_login import UserMixin, current_user
 from flask_principal import Need, identity_loaded, RoleNeed, UserNeed, ItemNeed
+from flask_diced import persistence_methods
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -75,6 +76,7 @@ class Permission(db.Model):
         return "::".join([self.name, self.model_name, self.record_id])
 
 
+@persistence_methods(db)
 class User(UserMixin, db.Model):
     id = db.Column(db.String(32), primary_key=True, default=_gen_uuid)
     name = db.Column(db.String(120))
@@ -98,6 +100,9 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.email or self.username)
+
+    def getCreditLine(self):
+        return self.credit_line or self.name or self.username
 
 
 def create_user(username: str, password: str, name='', email='') -> User:

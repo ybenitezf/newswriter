@@ -1,8 +1,47 @@
 {% extends 'layout.html' %}
 
+{% block page_title %}Perfil del usuario{% endblock %}
 
 {% block content %}
-<h1>User profile page</h1> 
+<h1>Perfil de <small>{{ user.name or user.username }}</small></h1>
 
-<a href="{{ url_for('.logout') }}">Salir</a>
+
+<div class="container">
+    <div class="row">
+        <div class="col s4">
+            <Strong>Nombre de usuario</Strong>
+        </div>
+        <div class="col s8">{{ user.username }}</div>
+    </div>
+    <div class="row">
+        <div class="col s4"><strong>Nombre</strong></div>
+        <div class="col s8">
+            {{ user.name or 'N/D' }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s4"><strong>Correo</strong></div>
+        <div class="col s8">{{ user.email or 'N/D' }}</div>
+    </div>
+    <div class="row">
+        <div class="col s4"><strong>Creditos</strong></div>
+        <div class="col s8 input-field">
+            {{ user.credit_line or user.name or user.username }}
+            <p class="grey-text">
+                Si no esta establecido se usaran el nombre o
+                el nombre de usuario, en ese orden, como valores por defecto
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12">
+            <a href="{{ url_for('.edit_user_profile') }}" class="waves-effect waves-light btn">
+                <i class="material-icons left">edit</i>
+                Modificar
+            </a>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}
