@@ -4,12 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_ldap3_login import LDAP3LoginManager
-from flask_admin import Admin
 from flask_principal import Principal
 from flask_caching import Cache
 from flask_static_digest import FlaskStaticDigest
-from flask_breadcrumbs import Breadcrumbs, register_breadcrumb
-from flask_menu import register_menu
+from flask_menu import register_menu, Menu
 from apifairy import APIFairy
 from flask_marshmallow import Marshmallow
 from celery import Celery
@@ -23,16 +21,15 @@ db = SQLAlchemy()
 migrate = Migrate()
 login_mgr = LoginManager()
 ldap_mgr = LDAP3LoginManager()
-admon = Admin()
 principal = Principal()
 cache = Cache()
 flask_statics = FlaskStaticDigest()
 apifairy = APIFairy()
 ma = Marshmallow()
 celery = Celery(__name__)
-crumbs = Breadcrumbs()
 # Breadcrumbs is a subclass of flask_menu.Menu
-menu = crumbs
+menu = Menu()
+
 
 def create_app(config='newswriter.config.Config'):
     """Inicializar la aplicación"""
@@ -62,7 +59,7 @@ def create_app(config='newswriter.config.Config'):
     logs.init_app(app)
 
     app.wsgi_app = ProxyFix(
-        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, 
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1,
         x_prefix=1)
 
     # inicializar otros plugins
@@ -76,7 +73,7 @@ def create_app(config='newswriter.config.Config'):
     cache.init_app(app)
     flask_statics.init_app(app)
     ma.init_app(app)
-    crumbs.init_app(app)
+    menu.init_app(app)
     apifairy.init_app(app)
     if app.config.get('CELERY_ENABLED'):
         init_celery(celery, app)
@@ -87,11 +84,7 @@ def create_app(config='newswriter.config.Config'):
     from newswriter.searchcommands import cmd as search_cmd
     from newswriter.admin_commands import users_cmds
     from adelacommon.deploy import deploy_cmd
-    from newswriter.views.admin import MyAdminIndexView, UserView
-    from newswriter.views.admin import RoleView, PermissionView
-    from newswriter.views.admin import BoardsAdminView, ArticleAdminView
 
-    admon.init_app(app, index_view=MyAdminIndexView())
     # registrar los blueprints
     app.register_blueprint(default)
     app.register_blueprint(users_bp)
@@ -100,28 +93,17 @@ def create_app(config='newswriter.config.Config'):
     app.register_blueprint(deploy_cmd)
     login_mgr.login_view = 'users.login'
 
-    # admon views 
-    admon.add_views(UserView(), RoleView(), PermissionView())
-    admon.add_views(ArticleAdminView(), BoardsAdminView())
-
     # the dummy thing
     @app.route("/")
-    @register_breadcrumb(app, '.', "Inicio")
     @register_menu(app, '.', "Inicio")
     def home():
-        """Registrar una raiz commun para los breadcrumbs"""
+        """Registrar una raiz commun para los menus"""
         return redirect(url_for('default.index'))
 
     @app.before_first_request
     def setupMenus():
         """Crear las entradas virtuales del menu"""
         m = menu.root()
-
-        # navbar para el menu principal de la app
-        navbar = m.submenu("navbar")
-        navbar._external_url = "#!"
-        navbar._endpoint = None
-        navbar._text = "NAVBAR"
 
         # actions, para el sidebar, registrar submenus debajo
         # de este menu

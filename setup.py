@@ -27,7 +27,7 @@ setup(
     platforms='any',
     setup_requires=['pytest-runner'],
     tests_require=[
-        'pytest', 
+        'pytest',
         'pytest-cov'
     ],
     install_requires=[
@@ -36,13 +36,12 @@ setup(
         'Flask-SQLAlchemy',
         'Flask-Login',
         'Flask-WTF',
-        'Flask-Admin',
         'flask-ldap3-login',
-        'Flask-Breadcrumbs',
         'Flask-Menu',
         'Flask-Principal',
         'Flask-Caching',
         'Flask-Static-Digest',
+        'Flask-Diced',
         'Flask',
         'email-validator',
         'PyMySQL',
@@ -59,10 +58,10 @@ setup(
         'adelacommon @ https://github.com/ybenitezf/adela-common/releases/download/v0.0.3/adelacommon-0.0.3-py3-none-any.whl'
     ],
     classifiers=[
-        'Environment :: Web Environment', 
+        'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
-        'Operating System :: OS Independent', 
+        'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',

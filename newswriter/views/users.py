@@ -1,27 +1,18 @@
 from newswriter import login_mgr, ldap_mgr, db
 from newswriter.models.security import User, create_user
-from newswriter.forms import LoginForm
+from newswriter.forms import LoginForm, ProfileForm
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_ldap3_login import AuthenticationResponseStatus
 from flask_principal import Identity, AnonymousIdentity, identity_changed
-from flask_breadcrumbs import register_breadcrumb, default_breadcrumb_root
 from flask_menu import register_menu, current_menu
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import request, redirect, url_for, flash, request, session
 
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
-default_breadcrumb_root(users_bp, '.')
 
 @users_bp.before_app_first_request
 def setupMenus():
-    # mis entradas en el navbar
-    navbar = current_menu.submenu("navbar.users")
-    navbar._external_url = "#!"
-    navbar._endpoint = None
-    navbar._text = "NAVBAR"
-    navbar._order = 999
-
     # mis entradas en el sidebar
     # mis actions
     actions = current_menu.submenu("actions.users")
@@ -32,7 +23,6 @@ def setupMenus():
 
 
 @users_bp.route('/profile')
-@register_breadcrumb(users_bp, ".show_user_profile", "Perfil")
 @register_menu(
     users_bp, "actions.users.profile", "Perfil",
     visible_when=lambda: current_user.is_authenticated)
@@ -46,21 +36,7 @@ def load_user(id):
     return User.query.get(id)
 
 
-def logout_menu_item(*args, **kwargs):
-    return [
-        {
-            'text': "<i class='material-icons right'>logout</i>{}".format(
-                current_user.username),
-            'url': url_for('users.logout')
-        }
-    ]
-
-
 @users_bp.route("/logout")
-@register_menu(
-    users_bp, "navbar.users.logout", '',
-    dynamic_list_constructor=logout_menu_item,
-    visible_when=lambda : current_user.is_authenticated)
 @register_menu(
     users_bp, "actions.users.lougout", "Salir",
     visible_when=lambda: current_user.is_authenticated)
@@ -135,3 +111,16 @@ def login():
         return redirect(next or url_for('default.index'))
 
     return render_template('users/login.html', form=form)
+
+
+@users_bp.route('/profile/edit', methods=['GET', 'POST'])
+@login_required
+def edit_user_profile():
+    obj = User.query.get(current_user.id)
+    form = ProfileForm(obj=obj)
+    if form.validate_on_submit():
+        form.populate_obj(obj)
+        obj.save()
+        flash("Perfil actualizado")
+        return redirect(url_for('.show_user_profile'))
+    return render_template('users/edit_profile.html', form=form, user=obj)

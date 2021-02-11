@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, HiddenField
-from wtforms.validators import DataRequired, EqualTo, Email
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email
+from wtforms.widgets.html5 import EmailInput
 
 
 class LoginForm(FlaskForm):
@@ -9,11 +10,9 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Entrar')
 
 
-class NewUserForm(FlaskForm):
+class ProfileForm(FlaskForm):
     name = StringField('Nombre', validators=[DataRequired()])
-    username = StringField('Usuario', validators=[DataRequired()])
-    email = StringField('Correo', validators=[Email()])
-    password1 = PasswordField(
-        'Contraseña', validators=[DataRequired(), EqualTo('password2')])
-    password2 = PasswordField('Confirmar Contraseña')
-    next = HiddenField()
+    credit_line = StringField('Creditos', validators=[DataRequired()])
+    email = StringField(
+        'Correo', validators=[Email()],
+        widget=EmailInput())
