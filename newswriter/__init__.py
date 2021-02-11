@@ -16,6 +16,8 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import pathlib
 import os
 
+__version__ = '0.0.4'
+
 logs = LogSetup()
 db = SQLAlchemy()
 migrate = Migrate()
