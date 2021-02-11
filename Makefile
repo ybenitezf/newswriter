@@ -64,7 +64,7 @@ dist: clean statics ## builds source and wheel package
 	python3 -m build
 	ls -l dist
 
-statics: clean-statics ## Build statics
+statics: ## Build statics
 	cd jsclient && yarn run build && cd ..
 	cd styles && yarn run build && cd ..
 	flask digest compile
