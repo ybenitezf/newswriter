@@ -41,4 +41,4 @@ You need to configure the instance, either by environment variables or a `.env` 
 - `SECRET_KEY`: application secret key, should be a random string
 - `SQLALCHEMY_DATABASE_URI`: the database to use, see [database urls](https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls) in SQLAlchemy documentation site. Defaults to SQLite and `appdb.db` in the instance folder
 - `UPLOAD_FOLDER`: directory to store the users uploads, should be a full path, defaults to instalce foler + `/uploads`
-- `INDEX_BASE_DIR`: directory to store indexing data for the searchs
+- `INDEX_BASE_DIR`: directory to store indexing data for the searches
