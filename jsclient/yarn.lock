@@ -834,7 +834,7 @@
 
 "@editorjs/image@ybenitezf/image":
   version "2.6.0"
-  resolved "https://codeload.github.com/ybenitezf/image/tar.gz/745a08ec7abbd2e86f2c0fe45e17e7fe8a515758"
+  resolved "https://codeload.github.com/ybenitezf/image/tar.gz/f2d8111fa39eb577bb22b9af2bf3d4582745fb80"
 
 "@editorjs/link@^2.3.1":
   version "2.3.1"

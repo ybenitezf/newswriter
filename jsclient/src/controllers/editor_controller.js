@@ -126,7 +126,61 @@ export default class EditorController extends Controller {
           }
         }
       },
-      i18n: {},
+      i18n: {
+        messages: {
+          ui: {
+            // Translations of internal UI components of the editor.js core
+            "blockTunes": {
+              "toggler": {
+                "Click to tune": "Clic para configurar"
+              },
+            },
+            "inlineToolbar": {
+              "converter": {
+                "Convert to": "Covertir a"
+              }
+            },
+            "toolbar": {
+              "toolbox": {
+                "Add": "Agregar"
+              }
+            }
+          },
+          toolNames: {
+            // Section for translation Tool Names: both block and inline tools
+            "Heading": "Titulo",
+            "Text": "Párrafo",
+            "List": "Lista",
+            "Image": "Imagen",
+            "Delimiter": "Separador",
+            "Quote": "Cita",
+            "Link": "Enlace",
+            "Warning": "Aviso",
+            "Raw HTML": "Código HTML",
+            "Bold": "Negrita",
+            "Italic": "Italica"
+          },
+          tools: {
+            // Section for passing translations to the external tools classes
+            // The first-level keys of this object should be equal of keys ot the 'tools' property of EditorConfig
+            "image": {
+              
+            }
+          },
+          blockTunes: {
+            // Section allows to translate Block Tunes
+            "delete": {
+              "Delete": "Eliminar"
+            },
+            "moveUp": {
+              "Move up": "Mover arriba"
+            },
+            "moveDown": {
+              "Move down": "Mover abajo"
+            }
+          },
+        }
+      },
       placeholder: 'Da clic aquí para comenzar a escribir',
       data: data.content ? data.content : {},
       logLevel: 'VERBOSE',
