@@ -71,3 +71,9 @@ class ImageModel(db.Model):
         db.String(32), db.ForeignKey('user.id'), nullable=True)
     uploader = db.relationship('User', lazy=True)
     store_data = db.Column(db.Text(), default='')
+
+    def getStoreData(self) -> dict:
+        if self.store_data:
+            return json.loads(self.store_data)
+        
+        return {}

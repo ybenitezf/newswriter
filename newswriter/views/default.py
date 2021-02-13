@@ -1,6 +1,4 @@
-from newswriter.modules.editorjs import renderBlock
 from newswriter.modules.imagetools import handleImageUpload, handleURL
-from newswriter.modules.imagetools import handleFromPhotoStore
 from newswriter.models.content import Article
 from newswriter.models import _gen_uuid
 from newswriter import filetools, db
@@ -13,8 +11,7 @@ from urllib.parse import urlparse
 from webpreview import OpenGraph
 import tempfile
 import os
-import re
-
+import zipfile
 
 default = Blueprint('default', __name__, url_prefix='/escritorio')
 
@@ -60,43 +57,83 @@ def uploaded_image(filename):
     return send_from_directory(folder, filename)
 
 
-def processInternalPhoto(p, photo_data):
-    # ok, this is an internal image
-    _l = current_app.logger.debug
-
-    _l("ok, this is an internal image")
-    try:
-        im = handleFromPhotoStore(
-            p.md5, p.fspath, 
-            current_app.config['UPLOAD_FOLDER'])
-        if not im.upload_by:
-            im.upload_by = p.upload_by
-        if not im.store_data:
-            im.store_data = json.dumps(photo_data)
-        db.session.add(im)
-        db.session.commit()
-    except Exception:
-        current_app.logger.exception(
-            "Error proccessing {}".format(p.md5))
+@default.route('/upload/photoarchive', methods=['POST'])
+@login_required
+def upload_photoarchive():
+    """Upload a photo from photostore"""
+    # check if the post request has the file part
+    if 'archive' not in request.files:
+        current_app.logger.debug("No file in request")
         return {"success": 0}
 
-    return {
-        "success": 1,
-        "file": {
-            "url": url_for(
-                'default.uploaded_image', 
-                filename=im.filename, 
-                _external=True),
-            "md5sum": p.md5,
-            "photostore": photo_data
-        },
-        "credit": p.credit_line,
-        "caption": render_template(
-            'photostore/editorjs/photo_excerpt.html',
-            data=photo_data.get('excerpt'),
-            block_renderer=renderBlock
-        )
-    }
+    # if user does not select file, browser also
+    # submit an empty part without filename
+    file = request.files['archive']
+    if file.filename == '':
+        current_app.logger.debug("Empty file name")
+        return {"success": 0}
+
+    if file and filetools.allowed_file(file.filename, {'zip'}):
+        # process the zip archive here.
+        filename = secure_filename(file.filename)
+        fullname = os.path.join(tempfile.mkdtemp(), filename)
+        file.save(fullname)
+        im = None
+
+        workdir = tempfile.TemporaryDirectory()
+        with zipfile.ZipFile(fullname, 'r') as zf:
+            if 'META-INFO.json' in zf.namelist():
+                zf.extractall(workdir.name)
+                # import the image here
+                metainfo_file = os.path.join(workdir.name, 'META-INFO.json')
+                image_data = json.load(open(metainfo_file, 'r'))
+                if 'Photo:v1' in image_data.get('version', ''):
+                    image_file = os.path.join(
+                        workdir.name, f"{image_data.get('md5')}.jpg")
+                    im = handleImageUpload(
+                        image_data.get('md5'), image_file, current_user.id, 
+                        current_app.config['UPLOAD_FOLDER'])
+                    if im.store_data is None:
+                        im.store_data = json.dumps(image_data)
+                    db.session.add(im)
+                    db.session.commit()
+                    # --
+                else:
+                    # not a photo archive or version missing
+                    current_app.logger.debug(
+                        "not a photo archive or version missing")
+            else:
+                # Error in zip file, is this a photostore archive?
+                current_app.logger.debug("Missing archive info file")
+        # remove temporary files
+        workdir.cleanup()
+        filetools.safe_remove(fullname)
+
+        if im is not None:
+            
+            caption = ""
+            if isinstance(im.getStoreData().get('excerpt'), dict):
+                # REVIEW: remove this went unnecesary
+                blocks = im.getStoreData().get('excerpt').get('blocks')
+                caption = "".join([d.get('data').get('text') for d in blocks])
+            else:
+                caption = im.getStoreData().get('excerpt')
+
+            return {
+                "success": 1,
+                "file": {
+                    "url": url_for(
+                        'default.uploaded_image', 
+                        filename=im.filename, 
+                        _external=True),
+                    "md5sum": im.id,
+                },
+                "credit": im.getStoreData().get('credit_line', ''),
+                "caption": caption
+            }
+
+    current_app.logger.debug("File not allowed")
+    return {"success": 0}
 
 
 @default.route('/upload-image', methods=['POST'])
@@ -116,7 +153,8 @@ def upload_image():
         current_app.logger.debug("Empty file name")
         return {"success": 0}
 
-    if file and filetools.allowed_file(file.filename):
+    if file and filetools.allowed_file(
+            file.filename, current_app.config.get('IMAGES_EXTENSIONS')):
         # do the actual thing
         filename = secure_filename(file.filename)
         fullname = os.path.join(tempfile.mkdtemp(), filename)

@@ -9,6 +9,7 @@ import Paragraph from '@editorjs/paragraph';
 import Header from '@editorjs/header';
 import LinkTool from '@editorjs/link';
 import RawTool from '@editorjs/raw';
+import Photo from "../photo";
 
 const axios = require('axios').default;
 
@@ -21,6 +22,7 @@ export default class EditorController extends Controller {
     apiendpoint: String,
     imageupload: String,
     imagefetchurl: String,
+    photoupload: String,
     linkendpoint: String
   }
 
@@ -94,6 +96,15 @@ export default class EditorController extends Controller {
           }
         },
         delimiter: Delimiter,
+        photo: {
+          class: Photo,
+          inlineToolbar: true,
+          config: {
+            endpoints: {
+              byFile: this.photouploadValue
+            }
+          }
+        },
         quote: {
           class: Quote,
           inlineToolbar: true,
