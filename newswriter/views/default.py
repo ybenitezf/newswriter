@@ -9,6 +9,7 @@ from flask_menu import register_menu, current_menu
 from werkzeug.utils import secure_filename
 from urllib.parse import urlparse
 from webpreview import OpenGraph
+from json.decoder import JSONDecodeError
 import tempfile
 import os
 import zipfile
@@ -81,44 +82,54 @@ def upload_photoarchive():
         im = None
 
         workdir = tempfile.TemporaryDirectory()
-        with zipfile.ZipFile(fullname, 'r') as zf:
-            if 'META-INFO.json' in zf.namelist():
-                zf.extractall(workdir.name)
-                # import the image here
-                metainfo_file = os.path.join(workdir.name, 'META-INFO.json')
-                image_data = json.load(open(metainfo_file, 'r'))
-                if 'Photo:v1' in image_data.get('version', ''):
-                    image_file = os.path.join(
-                        workdir.name, f"{image_data.get('md5')}.jpg")
-                    im = handleImageUpload(
-                        image_data.get('md5'), image_file, current_user.id, 
-                        current_app.config['UPLOAD_FOLDER'])
-                    if im.store_data is None:
-                        im.store_data = json.dumps(image_data)
-                    db.session.add(im)
-                    db.session.commit()
-                    # --
+        
+        try:
+            with zipfile.ZipFile(fullname, 'r') as zf:
+                if 'META-INFO.json' in zf.namelist():
+                    zf.extractall(workdir.name)
+                    # import the image here
+                    metainfo_file = os.path.join(workdir.name, 'META-INFO.json')
+                    image_data = json.load(open(metainfo_file, 'r'))
+                    if 'Photo:v1' in image_data.get('version', ''):
+                        image_file = os.path.join(
+                            # REVIEW: get extension from image_data or 
+                            # complete filename.
+                            workdir.name, f"{image_data.get('md5')}.jpg")
+                        im = handleImageUpload(
+                            image_data.get('md5'), image_file, current_user.id, 
+                            current_app.config['UPLOAD_FOLDER'])
+                        if im.store_data is None:
+                            im.store_data = json.dumps(image_data)
+                        db.session.add(im)
+                        db.session.commit()
+                        # --
+                    else:
+                        # not a photo archive or version missing
+                        current_app.logger.debug(
+                            "not a photo archive or version missing")
                 else:
-                    # not a photo archive or version missing
-                    current_app.logger.debug(
-                        "not a photo archive or version missing")
-            else:
-                # Error in zip file, is this a photostore archive?
-                current_app.logger.debug("Missing archive info file")
-        # remove temporary files
-        workdir.cleanup()
-        filetools.safe_remove(fullname)
+                    # Error in zip file, is this a photostore archive?
+                    current_app.logger.debug("Missing archive info file")
+        except zipfile.BadZipFile:
+            current_app.logger.debug("Bad zip file")
+        except UnicodeDecodeError:
+            current_app.logger.debug('MATA-INFO file missing or corruct')
+        except JSONDecodeError:
+            current_app.logger.debug('MATA-INFO file missing or corruct')
+        finally:
+            # remove temporary files
+            current_app.logger.debug("Removing temporary files")
+            workdir.cleanup()
+            filetools.safe_remove(fullname)
 
         if im is not None:
             
             caption = ""
             if isinstance(im.getStoreData().get('excerpt'), dict):
-                # REVIEW: remove this went unnecesary
                 blocks = im.getStoreData().get('excerpt').get('blocks')
                 caption = "".join([d.get('data').get('text') for d in blocks])
             else:
                 caption = im.getStoreData().get('excerpt')
-
             return {
                 "success": 1,
                 "file": {
@@ -127,6 +138,7 @@ def upload_photoarchive():
                         filename=im.filename, 
                         _external=True),
                     "md5sum": im.id,
+                    "store_data": image_data
                 },
                 "credit": im.getStoreData().get('credit_line', ''),
                 "caption": caption

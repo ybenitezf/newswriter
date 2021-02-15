@@ -197,14 +197,15 @@ export default class Photo {
     }
 
     save(blockContent) {
-        // REVIEW: what to do with empty data
+        return this.data
+    }
+
+    validate(saveData) {
         if (!this.data.file.url) {
-            this.data.caption = this.ui.image.captionInput.innerHTML
-            this.data.credit = this.ui.image.creditInput.innerHTML
-            return this.data
-        } else {
-            return null
+            return false
         }
+
+        return true
     }
 
     /**
