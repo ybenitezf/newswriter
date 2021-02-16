@@ -138,6 +138,9 @@ def upload_photoarchive():
                         filename=im.filename, 
                         _external=True),
                     "md5sum": im.id,
+                    "width": im.width or 0,
+                    "height": im.height or 0,
+                    "mode": im.orientation or "",
                     "store_data": image_data
                 },
                 "credit": im.getStoreData().get('credit_line', ''),
@@ -188,6 +191,10 @@ def upload_image():
                     'default.uploaded_image', 
                     filename=im.filename, 
                     _external=True),
+                # TODO: hacer esto con Marshmallow
+                "width": im.width or 0,
+                "height": im.height or 0,
+                "mode": im.orientation or "",
                 "md5sum": im.id,
             },
             "credit": "Foto de {}".format(im.uploader.name)
@@ -232,6 +239,9 @@ def fetch_image():
                 'default.uploaded_image', 
                 filename=im.filename, 
                 _external=True),
+            "width": im.width or 0,
+            "height": im.height or 0,
+            "mode": im.orientation or "",
             "md5sum": im.id,
         },
         "credit": credit
@@ -263,6 +273,9 @@ def fetch_link():
                             'default.uploaded_image', 
                             filename=im.filename, 
                             _external=True),
+                        "width": im.width or 0,
+                        "height": im.height or 0,
+                        "mode": im.orientation or "",
                         'md5sum': im.id
                     }
                 }

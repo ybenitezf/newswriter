@@ -71,6 +71,9 @@ class ImageModel(db.Model):
         db.String(32), db.ForeignKey('user.id'), nullable=True)
     uploader = db.relationship('User', lazy=True)
     store_data = db.Column(db.Text(), default='')
+    width = db.Column(db.Integer(), default=0)
+    height = db.Column(db.Integer(), default=0)
+    orientation = db.Column(db.String(10), default='cuadrada')
 
     def getStoreData(self) -> dict:
         if self.store_data:

@@ -9,14 +9,28 @@ import os
 import shutil
 
 
-def checkImageSize(file_name):
-    _l = current_app.logger.debug
-
+def imageSizeInfo(file_name) -> dict:
+    """Return a dictionary with size and orientation information"""
     with Image.open(file_name) as im:
         width, height = im.size
         mode = 'cuadrada'
         mode = 'vertical' if height > width else mode
         mode = 'horizontal' if width > height else mode
+
+    return {
+        "width": width,
+        "height": height,
+        "mode": mode
+    }
+
+
+def checkImageSize(file_name) -> dict:
+    _l = current_app.logger.debug
+    sizeinfo = imageSizeInfo(file_name)
+    with Image.open(file_name) as im:
+        width = sizeinfo.get('width')
+        height = sizeinfo.get('height')
+        mode = sizeinfo.get("mode")
         escalar =  False
         if im.format in ['JPEG', 'TIFF']:
             _l("Es JPEG/TIFF")
@@ -48,6 +62,8 @@ def checkImageSize(file_name):
         else:
             _l("formato soportado")
 
+    return sizeinfo
+
 
 def handleImageUpload(hash, filename, user_id, upload_folder):
     """Guardar imagen subida por el usuario
@@ -75,9 +91,12 @@ def handleImageUpload(hash, filename, user_id, upload_folder):
         with open(filename, mode="rb") as src:
             with open(full_dest_filename, mode="wb") as dst:
                 shutil.copyfileobj(src, dst)
-        checkImageSize(full_dest_filename)
+        sizeinfo = checkImageSize(full_dest_filename)
         im = ImageModel(
             id=hash, filename=dest_filename, upload_by=user_id)
+        im.width = sizeinfo.get('width')
+        im.height = sizeinfo.get('height')
+        im.orientation = sizeinfo.get('mode')
         return im
 
 
