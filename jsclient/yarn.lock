@@ -832,9 +832,9 @@
   resolved "https://registry.yarnpkg.com/@editorjs/header/-/header-2.6.1.tgz#454a46e4dbb32ae3aa1db4d22b0ddf2cc36c3134"
   integrity sha512-EsnyVFv5uThpU9tbQ/dUPFCQoa/sBFy2n+9tN3wOXJGx7sjea4fdcacJ2UYhO+7pCgZ+aSgmMOyGLYHUFbchvA==
 
-"@editorjs/image@ybenitezf/image":
-  version "2.6.0"
-  resolved "https://codeload.github.com/ybenitezf/image/tar.gz/f2d8111fa39eb577bb22b9af2bf3d4582745fb80"
+"@editorjs/image@https://github.com/ybenitezf/image/releases/download/v2.6.2/editorjs-image-v2.6.2.tgz":
+  version "2.6.2"
+  resolved "https://github.com/ybenitezf/image/releases/download/v2.6.2/editorjs-image-v2.6.2.tgz#7944b47004f00f8ecb23ee26cfbcfc6077a3fc62"
 
 "@editorjs/link@^2.3.1":
   version "2.3.1"
