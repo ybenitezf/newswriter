@@ -28,6 +28,12 @@ var contrains = {
       message: "^Debes poner los creditos"
     }
   },
+  summary: {
+    presence: {
+      allowEmpty: false,
+      message: "^Debes escribir el resumen"
+    }
+  },
   keywords: {
     presence: {
       allowEmpty: false,
@@ -56,7 +62,9 @@ var contrains = {
 export default class EditorController extends Controller {
 
   static targets = [
-    "content", "headline", "creditline", "tags", "toolbox"]
+    "content", "headline", "creditline", "tags", "toolbox",
+    "summary"
+  ]
   static values = {
     author: String,
     apiendpoint: String,
@@ -94,6 +102,8 @@ export default class EditorController extends Controller {
 
     this.headlineTarget.value = data.headline;
     this.creditlineTarget.value = data.creditline;
+    this.summaryTarget.value = data.summary;
+    M.textareaAutoResize(this.summaryTarget);
     var tags = M.Chips.getInstance(this.tagsTarget);
     if (data.keywords) {
       data.keywords.forEach((keyword) =>
@@ -282,6 +292,7 @@ export default class EditorController extends Controller {
       const outData = {
         headline: this.headlineTarget.value,
         creditline: this.creditlineTarget.value,
+        summary: this.summaryTarget.value,
         keywords: keywords,
         content: editorData
       }
@@ -296,11 +307,6 @@ export default class EditorController extends Controller {
           })
           console.log('Saving failed: ', error)
         });
-      } else {
-        M.toast({
-          html: 'Faltan datos',
-          classes: 'rounded red darken-4'
-        })
       }
 
     });

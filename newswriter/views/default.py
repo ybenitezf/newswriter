@@ -303,6 +303,7 @@ def articleEndPoint(pkid):
             return {
                 'headline': '',
                 'creditline': format(current_user.getCreditLine()),
+                'summary': '',
                 'keywords': [],
                 'content': {}
             }
@@ -312,6 +313,7 @@ def articleEndPoint(pkid):
                 'headline': article.headline,
                 'creditline': article.credit_line,
                 'keywords': article.keywords,
+                'summary': article.excerpt,
                 'content': article.getDecodedContent()
             }
 
@@ -322,6 +324,7 @@ def articleEndPoint(pkid):
             article = Article(
                 headline=request.json['headline'],
                 credit_line=request.json['creditline'],
+                excerpt=request.json['summary'],
                 content=json.dumps(request.json['content']),
                 author_id=current_user.id,
             )
@@ -335,6 +338,7 @@ def articleEndPoint(pkid):
             current_app.logger.debug("Saving article {}".format(article.id))
             article.headline = request.json['headline']
             article.credit_line = request.json['creditline']
+            article.excerpt = request.json['summary']
             article.content = json.dumps(request.json['content'])
             article.keywords = request.json['keywords']
             db.session.add(article)
