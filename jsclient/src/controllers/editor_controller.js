@@ -9,9 +9,49 @@ import Paragraph from '@editorjs/paragraph';
 import Header from '@editorjs/header';
 import LinkTool from '@editorjs/link';
 import RawTool from '@editorjs/raw';
+import validate, { async } from "validate.js";
 import Photo from "../photo";
 
 const axios = require('axios').default;
+const Validator = require('validate.js');
+
+var contrains = {
+  headline: {
+    presence: {
+      allowEmpty: false,
+      message: "^Título no puede estar vacio"
+    }
+  },
+  creditline: {
+    presence: {
+      allowEmpty: false,
+      message: "^Debes poner los creditos"
+    }
+  },
+  keywords: {
+    presence: {
+      allowEmpty: false,
+      message: "^Debes incluir palabras clave"
+    }
+  },
+  content: {
+    presence: {
+      allowEmpty: false,
+      message: "^El trabajo no tiene contenido"
+    },
+    length: function (value, attributes, attributeName, options, constraints) {
+      if (value) {
+        if (validate.isEmpty(value.blocks)) {
+          return { message: "^El trabajo no tiene contenido" }
+        } else {
+          return false
+        }
+      }
+
+      return false
+    }
+  }
+}
 
 export default class EditorController extends Controller {
 
@@ -39,24 +79,24 @@ export default class EditorController extends Controller {
     axios.get(apiUrl).then(
       (response) => this.loadEditorJS(response.data)
     ).catch((error) => {
-        this.loadEditorJS({})
-        console.log(error)
-        console.log("No pude cargar " + apiUrl)
-        M.toast({
-          html: '<b>ERROR</b>: No se pudo recuperar la información',
-          classes: 'rounded red darken-4'
-        })
+      this.loadEditorJS({})
+      console.log(error)
+      console.log("No pude cargar " + apiUrl)
+      M.toast({
+        html: '<b>ERROR</b>: No se pudo recuperar la información',
+        classes: 'rounded red darken-4'
+      })
     })
   }
 
   loadEditorJS(data) {
     M.FloatingActionButton.init(this.toolboxTarget, {});
-    
+
     this.headlineTarget.value = data.headline;
     this.creditlineTarget.value = data.creditline;
     var tags = M.Chips.getInstance(this.tagsTarget);
     if (data.keywords) {
-      data.keywords.forEach((keyword) => 
+      data.keywords.forEach((keyword) =>
         tags.addChip({
           tag: keyword
         })
@@ -175,7 +215,7 @@ export default class EditorController extends Controller {
             // Section for passing translations to the external tools classes
             // The first-level keys of this object should be equal of keys ot the 'tools' property of EditorConfig
             "image": {
-              
+
             }
           },
           blockTunes: {
@@ -211,6 +251,23 @@ export default class EditorController extends Controller {
     el.classList.remove('disabled')
   }
 
+  validate(values) {
+    const results = Validator(values, contrains);
+
+    if (results) {
+      // show errors
+      for (const [field, msg] of Object.entries(results)) {
+        M.toast({
+          html: msg,
+          classes: 'rounded red darken-4'
+        });
+      }
+      return false
+    }
+
+    return true;
+  }
+
   guardar(event) {
     // desactivar el boton un momento
     const apiUrl = this.apiendpointValue;
@@ -220,22 +277,32 @@ export default class EditorController extends Controller {
       keywords.push(tagData.tag);
     })
 
-    this.editor.save().then( (editorData) => {
+    this.editor.save().then((editorData) => {
+
       const outData = {
         headline: this.headlineTarget.value,
         creditline: this.creditlineTarget.value,
         keywords: keywords,
         content: editorData
       }
-      axios.post(apiUrl, outData).then(function (response) {
-        M.toast({html: 'Tus cambios han sido guardados', classes: 'rounded'})
-      }).catch( function (error) {
+
+      if (this.validate(outData)) {
+        axios.post(apiUrl, outData).then(function (response) {
+          M.toast({ html: 'Tus cambios han sido guardados', classes: 'rounded' })
+        }).catch(function (error) {
+          M.toast({
+            html: '<b>ERROR</b>: No se pudo guardar, error en el servidor',
+            classes: 'rounded red darken-4'
+          })
+          console.log('Saving failed: ', error)
+        });
+      } else {
         M.toast({
-          html: '<b>ERROR</b>: No se pudo guardar, error en el servidor',
+          html: 'Faltan datos',
           classes: 'rounded red darken-4'
         })
-        console.log('Saving failed: ', error)
-      })
+      }
+
     });
 
     this.enableGuardar()

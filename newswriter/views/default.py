@@ -301,7 +301,7 @@ def articleEndPoint(pkid):
             # this is a new one, just generate de defaults
             # --
             return {
-                'headline': 'Escribe un título',
+                'headline': '',
                 'creditline': format(current_user.getCreditLine()),
                 'keywords': [],
                 'content': {}
