@@ -2,8 +2,7 @@ from flask import current_app
 import hashlib
 import os
 
-def allowed_file(filename):
-    ALLOWED_EXTENSIONS = current_app.config.get('IMAGES_EXTENSIONS')
+def allowed_file(filename, ALLOWED_EXTENSIONS):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
