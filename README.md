@@ -38,10 +38,10 @@ make coverage
 
 ## Install
 
-TODO: review
-
 ```bash
-pip install https://github.com/ybenitezf/newswriter/archive/master.tar.gz
+python3 -m venv env
+. env/bin/activate
+pip install https://github.com/ybenitezf/newswriter/releases/download/v0.0.5/newswriter-0.0.5-py2.py3-none-any.whl
 ```
 
 You need to configure the instance, either by environment variables or a `.env` file:
@@ -50,3 +50,9 @@ You need to configure the instance, either by environment variables or a `.env` 
 - `SQLALCHEMY_DATABASE_URI`: the database to use, see [database urls](https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls) in SQLAlchemy documentation site. Defaults to SQLite and `appdb.db` in the instance folder
 - `UPLOAD_FOLDER`: directory to store the users uploads, should be a full path, defaults to instalce foler + `/uploads`
 - `INDEX_BASE_DIR`: directory to store indexing data for the searches
+
+After run the databases upgrade
+
+```bash
+flask deploy db-upgrade
+```
