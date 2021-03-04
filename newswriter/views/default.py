@@ -91,10 +91,15 @@ def upload_photoarchive():
                     metainfo_file = os.path.join(workdir.name, 'META-INFO.json')
                     image_data = json.load(open(metainfo_file, 'r'))
                     if 'Photo:v1' in image_data.get('version', ''):
-                        image_file = os.path.join(
-                            # REVIEW: get extension from image_data or 
-                            # complete filename.
-                            workdir.name, f"{image_data.get('md5')}.jpg")
+                        file_in_package = image_data.get('filename', None)
+                        if file_in_package is None:
+                            # old package version, don't include the filename
+                            # asume a jpeg image
+                            image_file = os.path.join(
+                                workdir.name, f"{image_data.get('md5')}.jpg")
+                        else:
+                            image_file = os.path.join(
+                                workdir.name, file_in_package)
                         im = handleImageUpload(
                             image_data.get('md5'), image_file, current_user.id, 
                             current_app.config['UPLOAD_FOLDER'])
