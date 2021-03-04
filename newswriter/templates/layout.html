@@ -17,75 +17,79 @@
 </head>
 
 <body>
-  <div class="navbar-fixed">
-    <nav>
-      <div class="nav-wrapper">
-        <ul class="left">
-          <li>
-            <a href="#" data-target="slide-out" data-controller="sidenav" data-sidenav-menuid-value="slide-out"
-              class="sidenav-trigger show-on-large">
-              <i class="material-icons">menu</i>
-            </a>
-          </li>
-        </ul>
-        <a href="{{ url_for('default.index') }}" class="brand-logo center">Redacción</a>
-      </div>
-    </nav>
-  </div>
-
-  <ul id="slide-out" class="sidenav">
-    {% block sidebar %}
-    {% for section in current_menu.submenu("actions").children %}
-    {% if section.children %}
-    <li><a class="subheader">{{ section.text }}</a></li>
-      {% for item in section.children %}
-      {% if item.visible: %}
-      <li>
-      <a href="{{ item.url }}" class="waves-effect">
-        {{ item.text|safe }}
-      </a>
-      </li>
-      {% endif %}
-      {% endfor %}
-    <li><div class="divider"></div></li>
-    {% endif %}
-    {% endfor %}
-    {% endblock %}
-  </ul>
-
-  <!-- Page Layout here -->
-  <div class="row">
-
-    <div class="col s12 m12 l12 mt-3">
-
-      {% with messages = get_flashed_messages() %}
-      {% if messages %}
-          {% for message in messages %}
-          <div class="hide" data-controller="flash">{{ message }}</div>
-          {% endfor %}
-      {% endif %}
-      {% endwith %}
-
-      <!-- content block -->
-      <div class="container">
-        {% block content %}{% endblock %}
-      </div>
+  <header>
+    <div class="navbar-fixed">
+      <nav>
+        <div class="nav-wrapper">
+          <ul class="left">
+            <li>
+              <a href="#" data-target="slide-out" data-controller="sidenav" data-sidenav-menuid-value="slide-out"
+                class="sidenav-trigger show-on-large">
+                <i class="material-icons">menu</i>
+              </a>
+            </li>
+          </ul>
+          <a href="{{ url_for('default.index') }}" class="brand-logo center">Redacción</a>
+        </div>
+      </nav>
     </div>
-
-  </div>
+  </header>
 
   <main>
-
-    <!-- main section -->
-    <div class="row mt-3">
-      <div class="col s3">
-
+    <ul id="slide-out" class="sidenav">
+      {% block sidebar %}
+      {% for section in current_menu.submenu("actions").children %}
+      {% if section.children %}
+      <li><a class="subheader">{{ section.text }}</a></li>
+        {% for item in section.children %}
+        {% if item.visible: %}
+        <li>
+        <a href="{{ item.url }}" class="waves-effect">
+          {{ item.text|safe }}
+        </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+      <li><div class="divider"></div></li>
+      {% endif %}
+      {% endfor %}
+      {% endblock %}
+    </ul>
+  
+    <!-- Page Layout here -->
+    <div class="row">
+  
+      <div class="col s12 m12 l12 mt-3">
+  
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="hide" data-controller="flash">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+  
+        <!-- content block -->
+        <div class="container">
+          {% block content %}{% endblock %}
+        </div>
       </div>
-      <div class="col s9">
-      </div>
+  
     </div>
   </main>
 
+  <footer class="page-footer">
+    <div class="footer-copyright">
+      <div class="container">
+        Newswriter {{ version }} &copy; {{ now().strftime('%Y') }} Redacción Adelante,
+        por <a href="https://github.com/ybenitezf">Yoel Benítez Fonseca</a>
+
+        <a class="right" href="https://www.python.org/" target="_blanck">
+          Powered by Python
+        </a>
+      </div>
+    </div>
+  </footer>
   <!--  Scripts-->
   <script src="{{ static_url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
   <script src="{{ static_url_for('static', filename='js/materialize.min.js') }}"></script>

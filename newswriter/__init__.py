@@ -15,6 +15,7 @@ from flask import Flask, redirect
 from werkzeug.middleware.proxy_fix import ProxyFix
 import pathlib
 import os
+import datetime
 
 __version__ = '0.0.6'
 
@@ -101,6 +102,13 @@ def create_app(config='newswriter.config.Config'):
     def home():
         """Registrar una raiz commun para los menus"""
         return redirect(url_for('default.index'))
+
+    @app.context_processor
+    def inject_version():
+        return {
+            "version": __version__,
+            "now": datetime.datetime.now
+        }
 
     @app.before_first_request
     def setupMenus():
