@@ -10,7 +10,7 @@
   {% for item in results.items: %}
   <div class="card">
     <div class="card-content">
-      <span class="card-title">{{ item.headline }}</span>
+      <span class="card-title"><a href="{{ url_for('.preview', pkid=item.id) }}">{{ item.headline }}</a></span>
       <p class="work-excerpt px-4">
         {% if item.excerpt %}
         {{ item.excerpt | striptags | truncate(140) }}
@@ -21,7 +21,7 @@
     </div>
     <div class="card-action">
       <a href="{{ url_for('default.write', pkid=item.id) }}">Editar</a>
-      <a href="#">Ver</a>
+      <a href="{{ url_for('.preview', pkid=item.id) }}">Ver</a>
     </div>
   </div>
   {% endfor %}

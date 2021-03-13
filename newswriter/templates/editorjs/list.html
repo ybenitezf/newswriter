@@ -1,0 +1,15 @@
+<div class="article--block--list">
+    {% if data.style is eq('ordered') %}
+    <ol class="article--block--list--ordered">
+        {% for item in data.get('items') %}
+        <li>{{ item | safe }}</li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <ul class="article--block--list--unordered">
+        {% for item in data.get('items') %}
+        <li>{{ item | safe }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
