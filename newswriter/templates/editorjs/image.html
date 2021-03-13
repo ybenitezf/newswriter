@@ -1,0 +1,20 @@
+<figure class="article--block--image" data-controller="artimage">
+    {% if data.file.width is gt(600) %}
+    <img class="responsive-img materialboxed {% if data.file.mode %}{{ data.file.mode }}{% endif %}"
+        src="{{ url_for('default.uploaded_image', filename=imageResolver(data.file.md5sum).filename) }}"
+        alt="{{ data.get('caption') }}" data-artimage-target="image">
+    {% else %}
+    <img class="{% if data.file.mode %}{{ data.file.mode }}{% endif %} tosmall"
+        src="{{ url_for('default.uploaded_image', filename=imageResolver(data.file.md5sum).filename) }}"
+        alt="{{ data.get('caption') }}" data-artimage-target="image">
+    {% endif %}
+    <figcaption>
+        {% if data.caption %}
+        <span class="article--block--image--caption">{{ data.caption|safe }}</span>
+        {% endif %}
+        {% if data.credit %}
+        {% if data.caption %} -- {% endif %}
+        <span class="article--block--image--credits">{{ data.credit }}</span>
+        {% endif %}
+    </figcaption>
+</figure>

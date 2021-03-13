@@ -1,0 +1,10 @@
+<figure class="article--block--quote {{ data.alignment }}-align">
+    <blockquote class="article--block--quote--quote">
+        {{ data.text | safe }}
+    </blockquote>
+    {% if data.caption %}
+    <figcaption class="article--block--quote--source">
+        {{ data.caption | safe }}
+    </figcaption>
+    {% endif %}
+</figure>

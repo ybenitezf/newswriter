@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<article class="article--item">
+    <header class="article--header">
+        <h1 class="article--title">{{ article.headline }}</h1>
+        <aside>
+            <p class="article--credits">Por {{ article.credit_line }}</p>
+            <p class="article--date" data-controller="fecha" data-fecha-momento-value="{{ article.created_on.isoformat() }}" data-fecha-formato-value="ll">
+                {{ article.created_on.isoformat() }}
+            </p>
+        </aside>
+    </header>
+    <!-- article content -->
+    <div class="article--content">
+        {% for b in article.getDecodedContent().get('blocks') %}
+        <div class="article--block">
+            {{ renderBlock(b)|safe }}
+        </div>
+        {% endfor %}
+    </div>
+    <!-- article footer -->
+    <footer class="article--footer">
+        <p>article footer</p>
+    </footer>
+
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large red" href="{{ url_for('.write', pkid=article.id) }}" title="Editar articulo">
+          <i class="large material-icons">mode_edit</i>
+        </a>
+    </div>
+</article>
+
+{% endblock %}

@@ -1,5 +1,6 @@
+from newswriter.modules.editorjs import renderBlock
 from newswriter.modules.imagetools import handleImageUpload, handleURL
-from newswriter.models.content import Article
+from newswriter.models.content import Article, ImageModel
 from newswriter.models import _gen_uuid
 from newswriter import filetools, db
 from flask import Blueprint, render_template, request, current_app
@@ -51,6 +52,13 @@ def write(pkid):
     return render_template('default/write.html', pkid=pkid, article=article)
 
 
+@default.route('preview/<pkid>')
+@login_required
+def preview(pkid):
+    article = Article.query.get_or_404(pkid)
+    return render_template('default/preview.html', article=article)
+
+
 @default.route('/assets/images/<filename>')
 def uploaded_image(filename):
     folder = os.path.join(
@@ -88,7 +96,8 @@ def upload_photoarchive():
                 if 'META-INFO.json' in zf.namelist():
                     zf.extractall(workdir.name)
                     # import the image here
-                    metainfo_file = os.path.join(workdir.name, 'META-INFO.json')
+                    metainfo_file = os.path.join(
+                        workdir.name, 'META-INFO.json')
                     image_data = json.load(open(metainfo_file, 'r'))
                     if 'Photo:v1' in image_data.get('version', ''):
                         file_in_package = image_data.get('filename', None)
@@ -264,9 +273,12 @@ def fetch_link():
             info = OpenGraph(
                 url, [
                     'og:title', 'og:description', 'og:image', 'og:site_name'])
+
             im = handleURL(
                 info.image, current_user.id, 
                 current_app.config['UPLOAD_FOLDER'])
+            db.session.add(im)
+            db.session.commit()
             return {
                 'success': 1,
                 'meta': {
@@ -353,3 +365,13 @@ def articleEndPoint(pkid):
 
     # something went worng
     return {"success": 0}, 500
+
+
+@default.context_processor
+def default_processors():
+    def imageResolver(id):
+        return ImageModel.query.get(id)
+
+    return dict(
+        renderBlock=renderBlock,
+        imageResolver=imageResolver)

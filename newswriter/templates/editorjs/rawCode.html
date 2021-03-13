@@ -1,0 +1,9 @@
+{% if "youtube" in data.html %}
+<div class="article--block--rawcode video-container">
+    {{ data.html | safe }}
+</div>
+{% else %}
+<div class="article--block--rawcode">
+    {{ data.html | safe }}
+</div>
+{% endif %}

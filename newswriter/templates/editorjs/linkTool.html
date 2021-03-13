@@ -1,0 +1,14 @@
+<div class="article--block--linktool">
+    <a href="{{ data.link }}" title="Abrir {{ data.link }}" target="_black">
+        <img src="{{ url_for('default.uploaded_image', filename=imageResolver(data.meta.image.md5sum).filename) }}" alt="{{ data.meta.title }}" />
+        <div class="article--block--linktool--title">
+            {{ data.meta.title }}
+        </div>
+        <div class="article--block--linktool--description">
+            {{ data.meta.description | truncate }}
+        </div>
+        {% if data.meta.site_name %}
+        <div class="article--block--linktool--site">{{ data.meta.site_name }}</div>
+        {% endif %}
+    </a>
+</div>
