@@ -17,7 +17,7 @@ import pathlib
 import os
 import datetime
 
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 logs = LogSetup()
 db = SQLAlchemy()
