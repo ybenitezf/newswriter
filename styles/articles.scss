@@ -372,6 +372,10 @@ $h6-fontsize: 1rem;
     }
 }
 
+.article--item:last-child {
+    margin-bottom: 6rem;
+}
+
 .hyphenate {
     word-wrap: break-word;
     overflow-wrap: break-word;

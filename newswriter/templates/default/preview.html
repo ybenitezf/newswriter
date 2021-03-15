@@ -19,17 +19,16 @@
             {{ renderBlock(b)|safe }}
         </div>
         {% endfor %}
+
+        <div class="fixed-action-btn">
+            <a class="btn-floating btn-large red" href="{{ url_for('.write', pkid=article.id) }}" title="Editar articulo">
+              <i class="large material-icons">mode_edit</i>
+            </a>
+        </div>
     </div>
     <!-- article footer -->
     <footer class="article--footer">
-        <p>article footer</p>
     </footer>
-
-    <div class="fixed-action-btn">
-        <a class="btn-floating btn-large red" href="{{ url_for('.write', pkid=article.id) }}" title="Editar articulo">
-          <i class="large material-icons">mode_edit</i>
-        </a>
-    </div>
 </article>
 
 {% endblock %}
