@@ -162,10 +162,12 @@ $h6-fontsize: 1rem;
         }
     }
 
+    .article--block--photo {
+        @extend .grey, .lighten-4;
+    }
+
     .article--block--image,
     .article--block--photo {
-        @extend .grey, .lighten-3;
-
         margin: 0 0;
         padding: 5px;
         border-radius: 1%;

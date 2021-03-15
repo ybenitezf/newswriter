@@ -1,4 +1,4 @@
-<figure class="article--block--image" data-controller="artimage">
+<figure class="article--block--photo" data-controller="artimage">
     {% if data.file.width is gt(600) %}
     <img class="responsive-img materialboxed {% if data.file.mode %}{{ data.file.mode }}{% endif %}"
         src="{{ url_for('default.uploaded_image', filename=imageResolver(data.file.md5sum).filename) }}"
