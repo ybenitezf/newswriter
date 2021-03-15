@@ -197,6 +197,9 @@ export default class Photo {
     }
 
     save(blockContent) {
+        this.data.caption = this.ui.image.captionInput.innerHTML;
+        this.data.credit = this.ui.image.creditInput.innerHTML;
+
         return this.data
     }
 
