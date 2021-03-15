@@ -32,6 +32,7 @@ setup(
     ],
     install_requires=[
         'wheel',
+        'SQLAlchemy<1.4',
         'Flask-Migrate',
         'Flask-SQLAlchemy',
         'Flask-Login',
