@@ -5,6 +5,7 @@ from PIL import Image, ImageFilter
 import tempfile
 import urllib
 import pathlib
+import logging
 import os
 import shutil
 
@@ -25,6 +26,10 @@ def imageSizeInfo(file_name) -> dict:
 
 
 def checkImageSize(file_name) -> dict:
+    # -- reduce PIL logging
+    pil_logger = logging.getLogger('PIL')
+    pil_logger.setLevel(logging.ERROR)
+    # --
     _l = current_app.logger.debug
     sizeinfo = imageSizeInfo(file_name)
     with Image.open(file_name) as im:

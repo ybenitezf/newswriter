@@ -8,12 +8,11 @@ BLOCK_TYPES = [
 
 def renderBlock(block, format='html'):
     if block.get('type') in BLOCK_TYPES:
-        current_app.logger.debug(f"Found template for {block.get('type')}")
         return render_template(
             "editorjs/{}.{}".format(
                 block.get('type'), format),
             **block)
     else:
-        current_app.logger.debug(f"Using default for {block.get('type')}")
+        current_app.logger.warning(f"Using default for {block.get('type')}")
         return render_template(
             "editorjs/default.{}".format(format), **block)
