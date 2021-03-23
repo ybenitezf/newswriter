@@ -7,7 +7,8 @@
         <h1 class="article--title">{{ article.headline }}</h1>
         <aside>
             <p class="article--credits">Por {{ article.credit_line }}</p>
-            <p class="article--date" data-controller="fecha" data-fecha-momento-value="{{ article.created_on.isoformat() }}" data-fecha-formato-value="ll">
+            <p class="article--date" data-controller="fecha"
+                data-fecha-momento-value="{{ article.created_on.isoformat() }}" data-fecha-formato-value="ll">
                 {{ article.created_on.isoformat() }}
             </p>
         </aside>
@@ -20,10 +21,14 @@
         </div>
         {% endfor %}
 
-        <div class="fixed-action-btn">
-            <a class="btn-floating btn-large red" href="{{ url_for('.write', pkid=article.id) }}" title="Editar articulo">
-              <i class="large material-icons">mode_edit</i>
+        <div class="fixed-action-btn" data-controller="fab">
+            <a class="btn-floating btn-large red" href="{{ url_for('.write', pkid=article.id) }}"
+                title="Editar articulo">
+                <i class="large material-icons">mode_edit</i>
             </a>
+            <ul>
+                <li><a class="btn-floating"  href="{{ url_for('.download_article', pkid=article.id) }}" title="Descargar articulo"><i class="material-icons">cloud_download</i></a></li>
+            </ul>
         </div>
     </div>
     <!-- article footer -->

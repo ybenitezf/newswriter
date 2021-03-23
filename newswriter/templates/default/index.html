@@ -22,6 +22,7 @@
     <div class="card-action">
       <a href="{{ url_for('default.write', pkid=item.id) }}">Editar</a>
       <a href="{{ url_for('.preview', pkid=item.id) }}">Ver</a>
+      <a href="{{ url_for('.download_article', pkid=item.id) }}" title="Descargar articulo">Exportar</a>
     </div>
   </div>
   {% endfor %}

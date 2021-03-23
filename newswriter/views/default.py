@@ -52,12 +52,17 @@ def write(pkid):
     return render_template('default/write.html', pkid=pkid, article=article)
 
 
-@default.route('preview/<pkid>')
+@default.route('/preview/<pkid>')
 @login_required
 def preview(pkid):
     article = Article.query.get_or_404(pkid)
     return render_template('default/preview.html', article=article)
 
+
+@default.route('/download/<pkid>')
+@login_required
+def download_article(pkid):
+    return {}
 
 @default.route('/assets/images/<filename>')
 def uploaded_image(filename):
