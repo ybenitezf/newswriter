@@ -1,5 +1,5 @@
 from newswriter.models.security import Role, User, create_user as CreateUser
-from newswriter.shemas import UserSchema, RoleSchema
+from newswriter.schemas import UserSchema, RoleSchema
 from newswriter import db
 from flask import Blueprint
 from pprint import pprint

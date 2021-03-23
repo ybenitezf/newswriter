@@ -3,14 +3,17 @@ from newswriter.modules.imagetools import handleImageUpload, handleURL
 from newswriter.models.content import Article, ImageModel
 from newswriter.models import _gen_uuid
 from newswriter import filetools, db
+from newswriter.modules.export import export_article
 from flask import Blueprint, render_template, request, current_app
 from flask import send_from_directory, url_for, abort, json
+from flask import Response, stream_with_context
 from flask_login import login_required, current_user
 from flask_menu import register_menu, current_menu
 from werkzeug.utils import secure_filename
 from urllib.parse import urlparse
 from webpreview import OpenGraph
 from json.decoder import JSONDecodeError
+from pathlib import Path
 import tempfile
 import os
 import zipfile
@@ -62,7 +65,23 @@ def preview(pkid):
 @default.route('/download/<pkid>')
 @login_required
 def download_article(pkid):
-    return {}
+    article = Article.query.get_or_404(pkid)
+    file_name = export_article(article)
+    file_handle = open(file_name, 'rb')
+
+    def stream_and_remove():
+        yield from file_handle
+        file_handle.close()
+        os.remove(file_name)
+
+    return Response(
+        stream_with_context(stream_and_remove()),
+        headers={
+            'Content-Type': 'application/zip',
+            'Content-Disposition': 'attachment; filename="{}"'.format(
+                Path(file_name).name)
+        }
+    )
 
 @default.route('/assets/images/<filename>')
 def uploaded_image(filename):
