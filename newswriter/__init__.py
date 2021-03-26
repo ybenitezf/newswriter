@@ -16,6 +16,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import pathlib
 import os
 import datetime
+import sys
 
 __version__ = '0.0.9'
 
@@ -36,7 +37,19 @@ menu = Menu()
 
 def create_app(config='newswriter.config.Config'):
     """Inicializar la aplicación"""
-    app = Flask(__name__)
+    if getattr(sys, 'frozen', False):
+        # para pyinstaller
+        # template_folder = os.path.join(sys._MEIPASS, 'templates')
+        # static_folder = os.path.join(sys._MEIPASS, 'static')
+        instance_path = os.path.join(os.path.expanduser("~"), "newswriter")
+        app = Flask(
+            __name__, 
+            # template_folder=template_folder,
+            # static_folder=static_folder, 
+            instance_path=instance_path)
+        app.config['PYINSTALLER'] = True
+    else:
+        app = Flask(__name__)
     app.config.from_object(config)
     if os.getenv('APP_CONFIG') and (not app.config.get('TESTING')):
         app.config.from_object(os.getenv('APP_CONFIG'))
@@ -69,7 +82,10 @@ def create_app(config='newswriter.config.Config'):
     db.init_app(app)
     migrate.init_app(app, db)
     login_mgr.init_app(app)
-    login_mgr.login_message = "Inicie sesión para acceder a esta página"
+    if app.config.get('PYINSTALLER') is True:
+        login_mgr.login_message = "Inicie sesión o registrarse"
+    else:
+        login_mgr.login_message = "Inicie sesión para acceder a esta página"
     if app.config.get('LDAP_AUTH'):
         ldap_mgr.init_app(app)
     principal.init_app(app)
