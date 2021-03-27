@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Icon=newswriter
+Name=Newswriter
+Comment=Para escribir la noticia
+Exec=newswriter
+Categories=Utility;
