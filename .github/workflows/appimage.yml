@@ -63,7 +63,7 @@ jobs:
           flask digest compile
       - name: Make binary
         run: |
-          pyinstaller --one-file --hiddenimport=celery.fixups.django \
+          pyinstaller --onefile --hiddenimport=celery.fixups.django \
             --hiddenimport='celery.fixups' \
             --add-data 'newswriter/templates:newswriter/templates' \
             --add-data 'newswriter/static:newswriter/static' \
