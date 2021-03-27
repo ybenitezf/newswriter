@@ -1,91 +1,91 @@
-name: CI
+# name: CI
 
-on: push
+# on: push
 
-jobs:
+# jobs:
 
-  build-statics:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '12'
-      - name: Build styles
-        run: |
-          npm install -g sass
-          cd styles
-          yarn install 
-          yarn run build && cd ..
-      - name: Build javascript
-        run: |
-          cd jsclient 
-          yarn install
-          yarn run build && cd ..
-      - uses: actions/upload-artifact@v2
-        with:
-          name: statics-files
-          path: newswriter/static
-          retention-days: 1
-      - uses: actions/upload-artifact@v2
-        with:
-          name: dinamyc-templates
-          path: newswriter/templates
-          retention-days: 1
+#   build-statics:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: actions/setup-node@v2
+#         with:
+#           node-version: '12'
+#       - name: Build styles
+#         run: |
+#           npm install -g sass
+#           cd styles
+#           yarn install 
+#           yarn run build && cd ..
+#       - name: Build javascript
+#         run: |
+#           cd jsclient 
+#           yarn install
+#           yarn run build && cd ..
+#       - uses: actions/upload-artifact@v2
+#         with:
+#           name: statics-files
+#           path: newswriter/static
+#           retention-days: 1
+#       - uses: actions/upload-artifact@v2
+#         with:
+#           name: dinamyc-templates
+#           path: newswriter/templates
+#           retention-days: 1
   
-  build-linux:
-    needs: build-statics
-    runs-on: ubuntu-latest
-    env:
-      FLASK_APP: newswriter:create_app()
-      FLASK_ENV: development
-      ARCH: x86_64
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-      - uses: actions/download-artifact@v2
-        with:
-          name: statics-files
-          path: newswriter/static
-      - uses: actions/download-artifact@v2
-        with:
-          name: dinamyc-templates
-          path: newswriter/templates
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install pyinstaller
-          python -m pip install -e .
-      - name: Digest statics
-        run: |
-          flask digest compile
-      - name: Make binary
-        run: |
-          pyinstaller --onefile --hiddenimport=celery.fixups.django \
-            --hiddenimport='celery.fixups' \
-            --add-data 'newswriter/templates:newswriter/templates' \
-            --add-data 'newswriter/static:newswriter/static' \
-            --add-data 'newswriter/migrations:newswriter/migrations' \
-            --hiddenimport=newswriter.config newswritercli.py
-          ls -lh dist
-      - name: Download linuxdeploy
-        run: |
-          wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-          chmod +x linuxdeploy-x86_64.AppImage
-      - name: Prepare AppDir
-        run: |
-          ./linuxdeploy-x86_64.AppImage --appdir AppDir
-          cp dist/newswritercli AppDir/usr/bin/newswriter
-          cp newswriter.desktop AppDir/usr/share/applications
-          cp newswriter.svg AppDir/usr/share/icons/hicolor/scalable/apps
-          ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage
-      - uses: actions/upload-artifact@v2
-        with:
-          name: distribution-linux
-          path: Newswriter-*-x86_64.AppImage
-          retention-days: 1
+#   build-linux:
+#     needs: build-statics
+#     runs-on: ubuntu-latest
+#     env:
+#       FLASK_APP: newswriter:create_app()
+#       FLASK_ENV: development
+#       ARCH: x86_64
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: actions/setup-python@v2
+#         with:
+#           python-version: '3.8'
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: statics-files
+#           path: newswriter/static
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: dinamyc-templates
+#           path: newswriter/templates
+#       - name: Install dependencies
+#         run: |
+#           pip install --upgrade pip
+#           pip install pyinstaller
+#           python -m pip install -e .
+#       - name: Digest statics
+#         run: |
+#           flask digest compile
+#       - name: Make binary
+#         run: |
+#           pyinstaller --onefile --hiddenimport=celery.fixups.django \
+#             --hiddenimport='celery.fixups' \
+#             --add-data 'newswriter/templates:newswriter/templates' \
+#             --add-data 'newswriter/static:newswriter/static' \
+#             --add-data 'newswriter/migrations:newswriter/migrations' \
+#             --hiddenimport=newswriter.config newswritercli.py
+#           ls -lh dist
+#       - name: Download linuxdeploy
+#         run: |
+#           wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+#           chmod +x linuxdeploy-x86_64.AppImage
+#       - name: Prepare AppDir
+#         run: |
+#           ./linuxdeploy-x86_64.AppImage --appdir AppDir
+#           cp dist/newswritercli AppDir/usr/bin/newswriter
+#           cp newswriter.desktop AppDir/usr/share/applications
+#           cp newswriter.svg AppDir/usr/share/icons/hicolor/scalable/apps
+#           ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage
+#       - uses: actions/upload-artifact@v2
+#         with:
+#           name: distribution-linux
+#           path: Newswriter-*-x86_64.AppImage
+#           retention-days: 1
 
   # build-python-dist:
   #   needs: build-statics
