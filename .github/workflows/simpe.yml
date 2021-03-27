@@ -27,6 +27,11 @@ jobs:
           name: statics-files
           path: newswriter/static
           retention-days: 1
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dinamyc-templates
+          path: newswriter/templates/jsfiles.html
+          retention-days: 1
   
   build-linux:
     needs: build-statics
@@ -43,6 +48,10 @@ jobs:
         with:
           name: statics-files
           path: newswriter/static
+      - uses: actions/download-artifact@v2
+        with:
+          name: dinamyc-templates
+          path: newswriter/templates/jsfiles.html
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -81,10 +90,14 @@ jobs:
         with:
           name: statics-files
           path: newswriter/static
+      - uses: actions/download-artifact@v2
+        with:
+          name: dinamyc-templates
+          path: newswriter/templates/jsfiles.html
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pyinstaller
+          pip install --upgrade build
           python -m pip install -e .
       - name: Digest statics
         run: |
@@ -116,6 +129,10 @@ jobs:
         with:
           name: statics-files
           path: newswriter/static
+      - uses: actions/download-artifact@v2
+        with:
+          name: dinamyc-templates
+          path: newswriter/templates/jsfiles.html
       - name: Install dependencies
         run: |
           pip install --upgrade pip
