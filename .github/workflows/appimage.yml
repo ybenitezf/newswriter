@@ -84,7 +84,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: distribution-linux
-          path: newswriter-x86_64.AppImage
+          path: Newswriter-*-x86_64.AppImage
           retention-days: 1
 
   # build-python-dist:
