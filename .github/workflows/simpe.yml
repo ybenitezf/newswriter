@@ -46,49 +46,64 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install --upgrade build
+          pip install pyinstaller
           python -m pip install -e .
       - name: Digest statics
         run: |
           flask digest compile
-      - name: Make package
+      - name: Make binary
         run: |
-          python -m build
+          pyinstaller --onefile --hiddenimport=celery.fixups.django \
+            --hiddenimport='celery.fixups' \
+            --add-data 'newswriter/templates:newswriter/templates' \
+            --add-data 'newswriter/static:newswriter/static' \
+            --add-data 'newswriter/migrations:newswriter/migrations' \
+            --hiddenimport=newswriter.config newswritercli.py
           ls -lh dist
       - uses: actions/upload-artifact@v2
         with:
-          name: distribution
+          name: distribution-linux
           path: dist/
           retention-days: 1
 
-  # build-win32:
-  #   needs: build-statics
-  #   runs-on: windows-latest
-  #   env:
-  #     FLASK_APP: newswriter:create_app()
-  #     FLASK_ENV: development
-  #   strategy:
-  #     matrix:
-  #       arch: ['x64', 'x86']
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-python@v2
-  #       with:
-  #         python-version: '3.8'
-  #         architecture: ${{ matrix.arch }}
-  #     - uses: actions/download-artifact@v2
-  #       with:
-  #         name: statics-files
-  #         path: newswriter/static
-  #     - name: Install dependencies
-  #       run: |
-  #         pip install --upgrade pip
-  #         pip install --upgrade build
-  #         python -m pip install -e .
-  #     - name: Digest statics
-  #       run: |
-  #         flask digest compile
-  #     - name: Make package
-  #       run: |
-  #         python -m build
-  #         ls -l dist
+  build-win32:
+    needs: build-statics
+    runs-on: windows-latest
+    env:
+      FLASK_APP: newswriter:create_app()
+      FLASK_ENV: development
+    strategy:
+      matrix:
+        arch: ['x64', 'x86']
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+          architecture: ${{ matrix.arch }}
+      - uses: actions/download-artifact@v2
+        with:
+          name: statics-files
+          path: newswriter/static
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pyinstaller
+          python -m pip install -e .
+      - name: Digest statics
+        run: |
+          flask digest compile
+      - name: Make binary
+        run: |
+          pyinstaller --onefile --hiddenimport=celery.fixups.django \
+            --hiddenimport='celery.fixups' \
+            --add-data 'newswriter/templates;newswriter/templates' \
+            --add-data 'newswriter/static;newswriter/static' \
+            --add-data 'newswriter/migrations;newswriter/migrations' \
+            --hiddenimport=newswriter.config newswritercli.py
+          ls -lh dist
+      - uses: actions/upload-artifact@v2
+        with:
+          name: distribution-win-${{ matrix.arch }}
+          path: dist/
+          retention-days: 1
