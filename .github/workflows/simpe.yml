@@ -30,7 +30,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: dinamyc-templates
-          path: newswriter/templates/jsfiles.html
+          path: newswriter/templates
           retention-days: 1
   
   build-linux:
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: dinamyc-templates
-          path: newswriter/templates/jsfiles.html
+          path: newswriter/templates
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -62,7 +62,7 @@ jobs:
           flask digest compile
       - name: Make binary
         run: |
-          pyinstaller --onefile --hiddenimport=celery.fixups.django \
+          pyinstaller --hiddenimport=celery.fixups.django \
             --hiddenimport='celery.fixups' \
             --add-data 'newswriter/templates:newswriter/templates' \
             --add-data 'newswriter/static:newswriter/static' \
@@ -93,7 +93,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: dinamyc-templates
-          path: newswriter/templates/jsfiles.html
+          path: newswriter/templates
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -132,7 +132,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: dinamyc-templates
-          path: newswriter/templates/jsfiles.html
+          path: newswriter/templates
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -143,7 +143,7 @@ jobs:
           flask digest compile
       - name: Make binary
         run: |
-          pyinstaller --onefile --hiddenimport="celery.fixups.django" `
+          pyinstaller --hiddenimport="celery.fixups.django" `
             --hiddenimport="celery.fixups" `
             --add-data "newswriter/templates;newswriter/templates" `
             --add-data "newswriter/static;newswriter/static" `
