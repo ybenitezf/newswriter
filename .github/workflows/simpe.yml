@@ -66,6 +66,37 @@ jobs:
           path: dist/
           retention-days: 1
 
+  build-python-dist:
+    needs: build-statics
+    runs-on: ubuntu-latest
+    env:
+      FLASK_APP: newswriter:create_app()
+      FLASK_ENV: development
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - uses: actions/download-artifact@v2
+        with:
+          name: statics-files
+          path: newswriter/static
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pyinstaller
+          python -m pip install -e .
+      - name: Digest statics
+        run: |
+          flask digest compile
+      - name: Make packages
+        run: python -m build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: distribution-python
+          path: dist/
+          retention-days: 1
+
   build-win32:
     needs: build-statics
     runs-on: windows-latest
@@ -102,7 +133,7 @@ jobs:
             --add-data "newswriter/migrations;newswriter/migrations" `
             --hiddenimport="newswriter.config" newswritercli.py
       - run: |
-          ls -lh dist
+          ls -l dist
       - uses: actions/upload-artifact@v2
         with:
           name: distribution-win-${{ matrix.arch }}
