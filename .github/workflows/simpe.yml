@@ -42,51 +42,53 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: statics-files
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install --upgrade build
-          python -m pip install -e .
-      - name: Digest statics
-        run: |
-          flask digest compile
-      - name: Make package
-        run: |
-          python -m build
-          ls -lh dist
-      - uses: actions/upload-artifact@v2
-        with:
-          name: distribution
-          path: dist/
-          retention-days: 1
+      - run: |
+          ls -lh
+      # - name: Install dependencies
+      #   run: |
+      #     pip install --upgrade pip
+      #     pip install --upgrade build
+      #     python -m pip install -e .
+      # - name: Digest statics
+      #   run: |
+      #     flask digest compile
+      # - name: Make package
+      #   run: |
+      #     python -m build
+      #     ls -lh dist
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: distribution
+      #     path: dist/
+      #     retention-days: 1
 
-  build-win32:
-    needs: build-statics
-    runs-on: windows-latest
-    env:
-      FLASK_APP: newswriter:create_app()
-      FLASK_ENV: development
-    strategy:
-      matrix:
-        arch: ['x64', 'x86']
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-          architecture: ${{ matrix.arch }}
-      - uses: actions/download-artifact@v2
-        with:
-          name: statics-files
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install --upgrade build
-          python -m pip install -e .
-      - name: Digest statics
-        run: |
-          flask digest compile
-      - name: Make package
-        run: |
-          python -m build
-          ls -l dist
+  # build-win32:
+  #   needs: build-statics
+  #   runs-on: windows-latest
+  #   env:
+  #     FLASK_APP: newswriter:create_app()
+  #     FLASK_ENV: development
+  #   strategy:
+  #     matrix:
+  #       arch: ['x64', 'x86']
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.8'
+  #         architecture: ${{ matrix.arch }}
+  #     - uses: actions/download-artifact@v2
+  #       with:
+  #         name: statics-files
+  #     - name: Install dependencies
+  #       run: |
+  #         pip install --upgrade pip
+  #         pip install --upgrade build
+  #         python -m pip install -e .
+  #     - name: Digest statics
+  #       run: |
+  #         flask digest compile
+  #     - name: Make package
+  #       run: |
+  #         python -m build
+  #         ls -l dist
