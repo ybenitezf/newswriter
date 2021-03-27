@@ -42,8 +42,11 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: statics-files
+          path: newswriter/static
       - run: |
           ls -lh
+          echo "An the statics"
+          ls -R newswriter/static
       # - name: Install dependencies
       #   run: |
       #     pip install --upgrade pip
