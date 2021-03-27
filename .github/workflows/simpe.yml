@@ -22,24 +22,45 @@ jobs:
           cd jsclient 
           yarn install
           yarn run build && cd ..
+      - uses: actions/upload-artifact@v2
+        with:
+          name: statics-files
+          path: newswriter/static
+          retention-days: 1
   
   build-linux:
     needs: build-statics
     runs-on: ubuntu-latest
+    env:
+      FLASK_APP: newswriter:create_app()
+      FLASK_ENV: development
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
-      - name: Make executable
+      - uses: actions/download-artifact@v2
+        with:
+          name: statics-files
+      - name: Install dependencies
         run: |
-          pip install --upgrade build pip
+          pip install --upgrade pip
+          pip install --upgrade build
+          python -m pip install -e .
+      - name: Digest statics
+        run: |
+          flask digest compile
+      - name: Make package
+        run: |
           python -m build
-          ls -l dist
+          ls -lh dist
 
   build-win32:
     needs: build-statics
     runs-on: windows-latest
+    env:
+      FLASK_APP: newswriter:create_app()
+      FLASK_ENV: development
     strategy:
       matrix:
         arch: ['x64', 'x86']
@@ -49,8 +70,18 @@ jobs:
         with:
           python-version: '3.8'
           architecture: ${{ matrix.arch }}
-      - name: Make executable
+      - uses: actions/download-artifact@v2
+        with:
+          name: statics-files
+      - name: Install dependencies
         run: |
-          pip install --upgrade build pip
+          pip install --upgrade pip
+          pip install --upgrade build
+          python -m pip install -e .
+      - name: Digest statics
+        run: |
+          flask digest compile
+      - name: Make package
+        run: |
           python -m build
-          ls -l dist
+          ls -lh dist
