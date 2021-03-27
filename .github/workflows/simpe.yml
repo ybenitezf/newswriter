@@ -43,27 +43,23 @@ jobs:
         with:
           name: statics-files
           path: newswriter/static
-      - run: |
-          ls -lh
-          echo "An the statics"
-          ls -R newswriter/static
-      # - name: Install dependencies
-      #   run: |
-      #     pip install --upgrade pip
-      #     pip install --upgrade build
-      #     python -m pip install -e .
-      # - name: Digest statics
-      #   run: |
-      #     flask digest compile
-      # - name: Make package
-      #   run: |
-      #     python -m build
-      #     ls -lh dist
-      # - uses: actions/upload-artifact@v2
-      #   with:
-      #     name: distribution
-      #     path: dist/
-      #     retention-days: 1
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install --upgrade build
+          python -m pip install -e .
+      - name: Digest statics
+        run: |
+          flask digest compile
+      - name: Make package
+        run: |
+          python -m build
+          ls -lh dist
+      - uses: actions/upload-artifact@v2
+        with:
+          name: distribution
+          path: dist/
+          retention-days: 1
 
   # build-win32:
   #   needs: build-statics
@@ -83,6 +79,7 @@ jobs:
   #     - uses: actions/download-artifact@v2
   #       with:
   #         name: statics-files
+  #         path: newswriter/static
   #     - name: Install dependencies
   #       run: |
   #         pip install --upgrade pip
