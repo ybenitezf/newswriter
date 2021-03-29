@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Newswriter
-Comment=Para escribir las noticias
-Exec=/usr/bin/bash /usr/bin/newswriter.sh
-Icon=newswriter
-Terminal=true
-Type=Application
-Categories=Office;
