@@ -1,11 +1,11 @@
 from newswriter import login_mgr, ldap_mgr, db
 from newswriter.models.security import User, create_user
-from newswriter.forms import LoginForm, ProfileForm
+from newswriter.forms import LoginForm, ProfileForm, RegisterForm
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_ldap3_login import AuthenticationResponseStatus
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 from flask_menu import register_menu, current_menu
-from flask import current_app, Blueprint, jsonify, render_template
+from flask import current_app, Blueprint, jsonify, render_template, abort
 from flask import request, redirect, url_for, flash, request, session
 
 
@@ -110,7 +110,36 @@ def login():
             identity=Identity(user.id, auth_type=auth_type))
         return redirect(next or url_for('default.index'))
 
-    return render_template('users/login.html', form=form)
+    return render_template(
+        'users/login.html', form=form, 
+        can_register = (current_app.config.get('PYINSTALLER') is True))
+
+
+@users_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_app.config.get('PYINSTALLER') is not True:
+        # solo esta disponible en instalaciones locales
+        abort(403)
+    
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        is_here = User.query.filter_by(username=form.username.data).first()
+        if is_here is None:
+            user = create_user(
+                form.username.data,
+                form.password1.data,
+                name=form.name.data
+            )
+            db.session.add(user)
+            db.session.commit()
+            flash("Usuario registrado")
+        else:
+            flash("Ya ese usuario esta registrado")
+            redirect(url_for(".register"))
+
+        return redirect(url_for("default.index"))
+    return render_template('users/register.html', form=form)
 
 
 @users_bp.route('/profile/edit', methods=['GET', 'POST'])
