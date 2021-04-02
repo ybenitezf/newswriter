@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 from webpreview import OpenGraph
 from json.decoder import JSONDecodeError
 import tempfile
+import pathlib
 import os
 import zipfile
 
@@ -64,6 +65,12 @@ def uploaded_image(filename):
     folder = os.path.join(
         current_app.config['UPLOAD_FOLDER'], "images")
     return send_from_directory(folder, filename)
+
+
+@default.route('/assets/<filename>')
+def download_attach(filename):
+    return send_from_directory(
+        current_app.config['UPLOAD_FOLDER'], filename)
 
 
 @default.route('/upload/photoarchive', methods=['POST'])
@@ -215,6 +222,46 @@ def upload_image():
         }
     
     current_app.logger.debug("Filename not valid")
+    return {"success": 0}
+
+
+@default.route('/upload-attach', methods=['POST'])
+@login_required
+def upload_attach():
+    """Editor.js AttachesTool backed"""
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        current_app.logger.debug("No file in request")
+        return {"success": 0}
+
+    # if user does not select file, browser also
+    # submit an empty part without filename
+    file = request.files['file']
+    if file.filename == '':
+        current_app.logger.debug("Empty file name")
+        return {"success": 0}
+
+    if file and filetools.allowed_file(
+            file.filename, current_app.config.get('ATTACHES_EXTENSIONS')):
+        # do the actual thing
+        filename = secure_filename(file.filename)
+        fullname = os.path.join(
+            current_app.config['UPLOAD_FOLDER'], filename)
+        file.save(fullname)
+        md5sum = filetools.md5(fullname)
+
+        return {
+            "success": 1,
+            "file": {
+                "url": url_for('.download_attach', filename=filename),
+                "size": pathlib.Path(fullname).stat().st_size,
+                "name": filename,
+                "extension": pathlib.Path(fullname).suffix.strip('.'),
+                "md5sum": md5sum
+            }
+        }
+
+    current_app.logger.debug(file.filename)
     return {"success": 0}
 
 

@@ -14,6 +14,7 @@ import Photo from "../photo";
 
 const axios = require('axios').default;
 const Validator = require('validate.js');
+const AttachesTool = require('@editorjs/attaches');
 
 var contrains = {
   headline: {
@@ -71,7 +72,8 @@ export default class EditorController extends Controller {
     imageupload: String,
     imagefetchurl: String,
     photoupload: String,
-    linkendpoint: String
+    linkendpoint: String,
+    attachupload: String
   }
 
   initialize() {
@@ -180,6 +182,14 @@ export default class EditorController extends Controller {
             author: this.authorValue
           },
         },
+        attaches: {
+          class: AttachesTool,
+          config: {
+            endpoint: this.attachuploadValue,
+            buttonText: "Seleccione archivo",
+            errorMessage: "Error al cargar el archivo"
+          }
+        },
         rawCode: {
           class: RawTool,
           config: {
@@ -218,6 +228,7 @@ export default class EditorController extends Controller {
             "Link": "Enlace",
             "Warning": "Aviso",
             "Raw HTML": "Código HTML",
+            "Attaches": "Adjunto",
             "Bold": "Negrita",
             "Italic": "Italica"
           },
