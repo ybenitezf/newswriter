@@ -45,9 +45,9 @@ def export_article(article: Article) -> str:
     ld(f"Exporting {article.id} to {work_dir.name}")
 
     # buscar cada una de las imagenes y exportarlas
-    to_export = ['image', 'photo']
+    to_export = ['image', 'photo', 'attaches']
     for block in article.getDecodedContent().get('blocks'):
-        if block.get('type') in to_export:
+        if block.get('type') == 'image':
             # zip image data
             block_data = block.get('data')
             img = ImageModel.query.get(block_data['file']['md5sum'])
@@ -59,6 +59,12 @@ def export_article(article: Article) -> str:
                 img = ImageModel.query.get(
                     block_data['meta']['image']['md5sum'])
                 assets.append(shutil.move(export_image(img), work_dir.name))
+        elif block.get('type') == 'attaches':
+            # agregar el adjunto al paquete
+            src = os.path.join(
+                current_app.config['UPLOAD_FOLDER'], 
+                block.get('data').get('file').get('name'))
+            assets.append(shutil.copy(src, work_dir.name))
 
     meta_file_name = os.path.join(
         work_dir.name, "META-INFO.json")
