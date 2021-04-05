@@ -17,7 +17,7 @@ class Config(object):
     IMAGES_EXTENSIONS = {'png', 'jpg', 'jpeg', 'tiff', 'gif'}
     ATTACHES_EXTENSIONS = {
         'txt', 'pdf','rtf', 'zip', 'rar', 'mp4', 'mp3',
-        'm4a', 'wav', 'aac', 
+        'm4a', 'wav', 'aac', 'mpg', 'mpeg',
         # office
         'doc', 'dot', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
         'odt', 'odg', 'odp', 'wps'
