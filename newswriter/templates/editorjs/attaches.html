@@ -1,0 +1,11 @@
+<div class="article--block--attaches">
+    <div class="article--block--attaches--title valign-wrapper">
+        <a href="{{ data.file.url }}" class="article--block--attaches--link" target="_blank">
+            <i class="material-icons left">attach_file</i>
+            {{ data.get('title') }}
+            <span class="article--block--attaches--size">
+                [{{ data.file.size | filesizeformat }}]
+            </span>
+        </a>
+    </div>
+</div>

@@ -814,6 +814,11 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
+"@editorjs/attaches@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@editorjs/attaches/-/attaches-1.0.1.tgz#1932f89173496b02783db166464a4239a1513246"
+  integrity sha512-jCCIQixivzZ6ZbDC8z4WAkEwzOJk+yxyPDDq4w3xmBMUTgZoIBFCzp7HEKwM13YFfC1SS4KVJGIFbcdDZBswFg==
+
 "@editorjs/delimiter@^1.1.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@editorjs/delimiter/-/delimiter-1.2.0.tgz#5075f1a3e68765cfb6aec8694b316d81e2b41607"

@@ -15,6 +15,13 @@ class Config(object):
     CACHE_TYPE = os.environ.get('CACHE_TYPE') or 'simple'
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER') or 'uploads'
     IMAGES_EXTENSIONS = {'png', 'jpg', 'jpeg', 'tiff', 'gif'}
+    ATTACHES_EXTENSIONS = {
+        'txt', 'pdf','rtf', 'zip', 'rar', 'mp4', 'mp3',
+        'm4a', 'wav', 'aac', 'mpg', 'mpeg',
+        # office
+        'doc', 'dot', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+        'odt', 'odg', 'odp', 'wps'
+    }
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True
     }
