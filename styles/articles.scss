@@ -372,6 +372,29 @@ $h6-fontsize: 1rem;
             text-align: center;
         }
     }
+
+    .article--block--attaches {
+        border-width: 2px;
+        border-color: color("grey", "lighten-1");
+        border-style: dashed;
+        border-radius: .5rem;
+        padding: 1rem;
+
+        .article--block--attaches--link {
+            width: 100%;
+            font-size: 1.3rem;
+
+            i {
+                color: color("grey", "darken-4");
+            }
+        }
+
+        .article--block--attaches--size {
+            color: color("grey", "darken-2");
+            font-family: monospace;
+            font-size: 80%;
+        }
+    }
 }
 
 .article--item:last-child {
