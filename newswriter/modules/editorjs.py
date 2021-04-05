@@ -3,7 +3,7 @@ from flask import render_template, current_app
 
 BLOCK_TYPES = [
         'paragraph', 'delimiter', 'header', 'list', 'quote', 'warning',
-        'image', 'linkTool', 'photo', 'rawCode']
+        'image', 'linkTool', 'photo', 'rawCode', 'attaches']
 
 
 def renderBlock(block, format='html'):
