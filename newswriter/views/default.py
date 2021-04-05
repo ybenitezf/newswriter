@@ -21,6 +21,7 @@ import zipfile
 
 default = Blueprint('default', __name__, url_prefix='/escritorio')
 
+
 @default.before_app_first_request
 def setupMenus():
     # mis entradas en el sidebar
@@ -28,6 +29,7 @@ def setupMenus():
     actions._text = "Escritorio"
     actions._endpoint = None
     actions._external_url = "#!"
+
 
 @default.route('/')
 @register_menu(default, "actions.default.index", "Mis trabajos")
@@ -84,6 +86,7 @@ def download_article(pkid):
         }
     )
 
+
 @default.route('/assets/images/<filename>')
 def uploaded_image(filename):
     folder = os.path.join(
@@ -121,7 +124,7 @@ def upload_photoarchive():
         im = None
 
         workdir = tempfile.TemporaryDirectory()
-        
+
         try:
             with zipfile.ZipFile(fullname, 'r') as zf:
                 if 'META-INFO.json' in zf.namelist():
@@ -141,7 +144,7 @@ def upload_photoarchive():
                             image_file = os.path.join(
                                 workdir.name, file_in_package)
                         im = handleImageUpload(
-                            image_data.get('md5'), image_file, current_user.id, 
+                            image_data.get('md5'), image_file, current_user.id,
                             current_app.config['UPLOAD_FOLDER'])
                         if im.store_data is None:
                             im.store_data = json.dumps(image_data)
@@ -168,7 +171,7 @@ def upload_photoarchive():
             filetools.safe_remove(fullname)
 
         if im is not None:
-            
+
             caption = ""
             if isinstance(im.getStoreData().get('excerpt'), dict):
                 blocks = im.getStoreData().get('excerpt').get('blocks')
@@ -179,8 +182,8 @@ def upload_photoarchive():
                 "success": 1,
                 "file": {
                     "url": url_for(
-                        'default.uploaded_image', 
-                        filename=im.filename, 
+                        'default.uploaded_image',
+                        filename=im.filename,
                         _external=True),
                     "md5sum": im.id,
                     "width": im.width or 0,
@@ -222,7 +225,7 @@ def upload_image():
         md5sum = filetools.md5(fullname)
 
         im = handleImageUpload(
-            md5sum, fullname, current_user.id, 
+            md5sum, fullname, current_user.id,
             current_app.config['UPLOAD_FOLDER'])
         db.session.add(im)
         db.session.commit()
@@ -233,8 +236,8 @@ def upload_image():
             "success": 1,
             "file": {
                 "url": url_for(
-                    'default.uploaded_image', 
-                    filename=im.filename, 
+                    'default.uploaded_image',
+                    filename=im.filename,
                     _external=True),
                 # TODO: hacer esto con Marshmallow
                 "width": im.width or 0,
@@ -244,7 +247,7 @@ def upload_image():
             },
             "credit": "Foto de {}".format(im.uploader.name)
         }
-    
+
     current_app.logger.debug("Filename not valid")
     return {"success": 0}
 
@@ -308,8 +311,8 @@ def fetch_image():
         credit = "Tomada de Internet"
 
     try:
-        im = handleURL(url, current_user.id, 
-            current_app.config['UPLOAD_FOLDER'])
+        im = handleURL(url, current_user.id,
+                       current_app.config['UPLOAD_FOLDER'])
         db.session.add(im)
         db.session.commit()
     except Exception:
@@ -321,8 +324,8 @@ def fetch_image():
         "success": 1,
         "file": {
             "url": url_for(
-                'default.uploaded_image', 
-                filename=im.filename, 
+                'default.uploaded_image',
+                filename=im.filename,
                 _external=True),
             "width": im.width or 0,
             "height": im.height or 0,
@@ -346,7 +349,7 @@ def fetch_link():
                     'og:title', 'og:description', 'og:image', 'og:site_name'])
 
             im = handleURL(
-                info.image, current_user.id, 
+                info.image, current_user.id,
                 current_app.config['UPLOAD_FOLDER'])
             db.session.add(im)
             db.session.commit()
@@ -358,8 +361,8 @@ def fetch_link():
                     'site_name': info.site_name,
                     'image': {
                         'url': url_for(
-                            'default.uploaded_image', 
-                            filename=im.filename, 
+                            'default.uploaded_image',
+                            filename=im.filename,
                             _external=True),
                         "width": im.width or 0,
                         "height": im.height or 0,
@@ -372,7 +375,7 @@ def fetch_link():
             _l.exception("Ocurrio un error procesando el enlace")
             return {'success': 0}
 
-    return {"success" : 0}
+    return {"success": 0}
 
 
 @default.route('/article/<pkid>', methods=['GET', 'POST'])
