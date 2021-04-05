@@ -2,6 +2,7 @@ from newswriter.modules.editorjs import renderBlock
 from newswriter.modules.imagetools import handleImageUpload, handleURL
 from newswriter.models.content import Article, ImageModel
 from newswriter.models import _gen_uuid
+from newswriter.forms import UploadArticleForm
 from newswriter import filetools, db
 from newswriter.modules.export import export_article
 from flask import Blueprint, render_template, request, current_app
@@ -56,6 +57,26 @@ def write(pkid):
     article = Article.query.get(pkid)
 
     return render_template('default/write.html', pkid=pkid, article=article)
+
+
+@default.route('/importar', methods=['GET', 'POST'])
+@register_menu(default, "actions.default.import_article", "Importar")
+@login_required
+def import_article():
+    """Seleccionar paquete a importar"""
+    form = UploadArticleForm()
+
+    if form.validate_on_submit():
+        f = form.archive.data
+        filename = secure_filename(f.filename)
+        work_dir = tempfile.TemporaryDirectory()
+        f.save(os.path.join(work_dir.name, filename))
+        current_app.logger.debug(f"importing {filename}")
+        ## intentar procesar el archivo
+        ## --
+        work_dir.cleanup()
+
+    return render_template('default/import_form.html', form=form)
 
 
 @default.route('/preview/<pkid>')

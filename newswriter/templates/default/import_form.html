@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}{{'Importat - Redacción'}}{% endblock %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="container">
+        <h3>Importar articulo</h3>
+        <div class="row">
+            <div class="file-field input-field col s12">
+                <div class="btn">
+                    <span><i class="material-icons left">file_upload</i> Archivo</span>
+                    <input type="file" name="archive"
+                        accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+
+                {% if form.archive.errors %}
+                {% for error in form.archive.errors %}
+                  <p class="red-text text-darken-4">{{ error }}</p>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-field col s12 center">
+                <button class="btn waves-effect waves-light" type="submit" name="action">
+                    <i class="material-icons left">send</i> enviar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

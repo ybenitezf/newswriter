@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
 from wtforms.widgets.html5 import EmailInput
@@ -30,3 +31,10 @@ class RegisterForm(FlaskForm):
     )
     password2 = PasswordField(
         'Confirmar contraseña', validators=[DataRequired()])
+
+class UploadArticleForm(FlaskForm):
+    archive = FileField(
+        'Archivo', validators=[
+            FileRequired(),
+            FileAllowed(['zip'])]
+    )
