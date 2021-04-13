@@ -6,6 +6,7 @@ from newswriter import ma, db
 from newswriter.schemas import ImageModelExportSchema
 from newswriter.models.content import Article, ImageModel
 from newswriter.models.security import User, Role, password_generator
+from newswriter.models.security import create_user
 from flask import current_app, json
 from marshmallow import fields, validate
 import tempfile
@@ -72,14 +73,13 @@ def importUserInfo(user_data) -> User:
         # Ya tengo este usuario en la BD
         return u
     else:
-        u = User()
-        u.name = user_data["name"]
-        u.username = user_data["username"]
-        u.credit_line = user_data["credit_line"]
-        u.email = user_data["email"]
-        u.id = user_data.get('id')
-        u.set_password(password_generator())
-        Role.createUserEspecialRole(u)
+        u = create_user(
+            user_data["username"], password_generator(),
+            name=user_data["name"], 
+            email=user_data["email"],
+            credit_line=user_data["credit_line"],
+            id=user_data.get('id')
+        )
 
     return u
 

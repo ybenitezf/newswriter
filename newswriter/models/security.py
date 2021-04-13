@@ -106,16 +106,29 @@ class User(UserMixin, db.Model):
         return self.credit_line or self.name or self.username
 
 
-def create_user(username: str, password: str, name='', email='') -> User:
+def create_user(
+    username: str,
+    password: str,
+    name='',
+    email='',
+    credit_line='',
+    id=None
+) -> User:
     """Crear un usuario"""
-    user = User()
+    if id is None:
+        user = User()
+    else:
+        user = User(id=id)
     user.name = name
     user.set_password(password)
     user.username = username
     user.email = email
+    user.credit_line = credit_line
 
     # crear grupo especial para el usuario
     Role.createUserEspecialRole(user)
+
+    # crear el board personal del usuario
 
     return user
 
@@ -128,7 +141,7 @@ def password_generator(length=8):
     :returns string <class 'str'>
     '''
     LETTERS = string.ascii_letters
-    NUMBERS = string.digits 
+    NUMBERS = string.digits
     PUNCTUATION = string.punctuation
 
     # create alphanumerical from string constants
