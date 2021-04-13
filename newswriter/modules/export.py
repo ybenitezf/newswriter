@@ -45,9 +45,8 @@ def export_article(article: Article) -> str:
     ld(f"Exporting {article.id} to {work_dir.name}")
 
     # buscar cada una de las imagenes y exportarlas
-    to_export = ['image', 'photo', 'attaches']
     for block in article.getDecodedContent().get('blocks'):
-        if block.get('type') == 'image':
+        if block.get('type') in ['image', 'photo']:
             # zip image data
             block_data = block.get('data')
             img = ImageModel.query.get(block_data['file']['md5sum'])

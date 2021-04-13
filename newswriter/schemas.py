@@ -58,10 +58,15 @@ class ImageModelExportSchema(ma.SQLAlchemySchema):
     id = ma.auto_field()
     filename = ma.auto_field()
     uploader = fields.Nested(UserSchema)
-    store_data = fields.Method('get_photostore')
+    store_data = fields.Method(
+        'serialize_photostore', 
+        deserialize='deserialize_photostore')
     width = ma.auto_field()
     height = ma.auto_field()
     orientation = ma.auto_field()
 
-    def get_photostore(self, obj: ImageModel):
+    def serialize_photostore(self, obj: ImageModel):
         return obj.getStoreData()
+
+    def deserialize_photostore(self, value):
+        return value
