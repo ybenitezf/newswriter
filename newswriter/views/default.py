@@ -1,6 +1,6 @@
 from newswriter.modules.editorjs import renderBlock
 from newswriter.modules.imagetools import handleImageUpload, handleURL
-from newswriter.models.content import Article, ImageModel
+from newswriter.models.content import Article, ImageModel, Board
 from newswriter.models import _gen_uuid
 from newswriter.forms import UploadArticleForm
 from newswriter import filetools, db
@@ -39,9 +39,10 @@ def setupMenus():
 @login_required
 def index():
     page = request.args.get('page', 1, type=int)
+    ub = Board.getUserBoard(current_user)
 
     articulos = Article.query.filter(
-        Article.author_id == current_user.id).order_by(
+        Article.board_id == ub.id).order_by(
             Article.created_on.desc()).paginate(page, per_page=4)
 
     return render_template(
