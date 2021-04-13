@@ -1,5 +1,6 @@
 from newswriter import db
 from newswriter.models import _gen_uuid
+from newswriter.models.permissions import BOARD_ALL_PERMS
 from flask_login import UserMixin, current_user
 from flask_principal import Need, identity_loaded, RoleNeed, UserNeed, ItemNeed
 from flask_diced import persistence_methods
@@ -60,6 +61,8 @@ class Role(db.Model):
             user.roles.append(r)
             db.session.add(r)
             db.session.add(user)
+
+        return r
 
 
 class Permission(db.Model):
@@ -126,9 +129,20 @@ def create_user(
     user.credit_line = credit_line
 
     # crear grupo especial para el usuario
-    Role.createUserEspecialRole(user)
+    user_rol = Role.createUserEspecialRole(user)
 
     # crear el board personal del usuario
+    from newswriter.models import content  # avoid circular import
+    user_board = content.Board.createUserBoard(user)
+    # assing add user permissions on the board
+    for p in BOARD_ALL_PERMS:
+        db.session.add(Permission(
+            name=p,
+            model_name='board',
+            record_id=user_board.id,
+            role_id=user_rol.id
+        ))
+    # --
 
     return user
 
