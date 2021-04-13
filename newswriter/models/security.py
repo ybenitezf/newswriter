@@ -4,7 +4,8 @@ from flask_login import UserMixin, current_user
 from flask_principal import Need, identity_loaded, RoleNeed, UserNeed, ItemNeed
 from flask_diced import persistence_methods
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import string
+import random
 
 user_roles = db.Table(
     'user_roles',
@@ -117,6 +118,30 @@ def create_user(username: str, password: str, name='', email='') -> User:
     Role.createUserEspecialRole(user)
 
     return user
+
+
+def password_generator(length=8):
+    '''
+    Generates a random password having the specified length
+    :length -> length of password to be generated. Defaults to 8
+        if nothing is specified.
+    :returns string <class 'str'>
+    '''
+    LETTERS = string.ascii_letters
+    NUMBERS = string.digits 
+    PUNCTUATION = string.punctuation
+
+    # create alphanumerical from string constants
+    printable = f'{LETTERS}{NUMBERS}{PUNCTUATION}'
+
+    # convert printable from string to list and shuffle
+    printable = list(printable)
+    random.shuffle(printable)
+
+    # generate random password and convert to string
+    random_password = random.choices(printable, k=length)
+    random_password = ''.join(random_password)
+    return random_password
 
 
 @identity_loaded.connect

@@ -5,12 +5,14 @@ from newswriter.models import _gen_uuid
 from newswriter.forms import UploadArticleForm
 from newswriter import filetools, db
 from newswriter.modules.export import export_article
+from newswriter.modules.import_art import importItem, NotMetadataInFile
+from newswriter.modules.import_art import NewVersionExits
 from flask import Blueprint, render_template, request, current_app
 from flask import send_from_directory, url_for, abort, json
-from flask import Response, stream_with_context
+from flask import Response, stream_with_context, flash
 from flask_login import login_required, current_user
 from flask_menu import register_menu, current_menu
-from werkzeug.utils import secure_filename
+from werkzeug.utils import redirect, secure_filename
 from urllib.parse import urlparse
 from webpreview import OpenGraph
 from json.decoder import JSONDecodeError
@@ -69,12 +71,33 @@ def import_article():
     if form.validate_on_submit():
         f = form.archive.data
         filename = secure_filename(f.filename)
-        work_dir = tempfile.TemporaryDirectory()
-        f.save(os.path.join(work_dir.name, filename))
-        current_app.logger.debug(f"importing {filename}")
-        ## intentar procesar el archivo
-        ## --
-        work_dir.cleanup()
+        fullname = os.path.join(tempfile.mkdtemp(), filename)
+        f.save(fullname)
+
+        try:
+            art = importItem(fullname, current_app.config['UPLOAD_FOLDER'])
+            flash("Articulo importado")
+            return redirect(url_for(".preview", pkid=art.id))
+        except NewVersionExits as e:
+            url = url_for(".preview", pkid=e.article.id)
+            current_app.logger.debug(
+                f"Ya existe una versión más reciente de ese trabajo: {url}")
+        except NotMetadataInFile:
+            current_app.logger.exception(
+                "No existe el archivo META-INFO.json")
+            flash("META-INFO file missing or corruct")
+        except zipfile.BadZipFile:
+            current_app.logger.exception("Bad zip file")
+            flash("El archivo esta corructo")
+        except UnicodeDecodeError:
+            current_app.logger.exception('MATA-INFO file missing or corruct')
+            flash("No se puede leer el archivo")
+        except JSONDecodeError:
+            flash("No se puede leer el archivo")
+            current_app.logger.exception('MATA-INFO file missing or corruct')
+        finally:
+            current_app.logger.debug("Removing uploaded file")
+            filetools.safe_remove(fullname)
 
     return render_template('default/import_form.html', form=form)
 
@@ -204,8 +227,8 @@ def upload_photoarchive():
                 "file": {
                     "url": url_for(
                         'default.uploaded_image',
-                        filename=im.filename,
-                        _external=True),
+                        filename=im.filename),
+                    "filename": im.filename,
                     "md5sum": im.id,
                     "width": im.width or 0,
                     "height": im.height or 0,
@@ -258,9 +281,8 @@ def upload_image():
             "file": {
                 "url": url_for(
                     'default.uploaded_image',
-                    filename=im.filename,
-                    _external=True),
-                # TODO: hacer esto con Marshmallow
+                    filename=im.filename),
+                "filename": im.filename,
                 "width": im.width or 0,
                 "height": im.height or 0,
                 "mode": im.orientation or "",
@@ -346,8 +368,8 @@ def fetch_image():
         "file": {
             "url": url_for(
                 'default.uploaded_image',
-                filename=im.filename,
-                _external=True),
+                filename=im.filename),
+            "filename": im.filename,
             "width": im.width or 0,
             "height": im.height or 0,
             "mode": im.orientation or "",
@@ -383,8 +405,8 @@ def fetch_link():
                     'image': {
                         'url': url_for(
                             'default.uploaded_image',
-                            filename=im.filename,
-                            _external=True),
+                            filename=im.filename),
+                        "filename": im.filename,
                         "width": im.width or 0,
                         "height": im.height or 0,
                         "mode": im.orientation or "",
