@@ -1,6 +1,8 @@
 from newswriter.modules.editorjs import renderBlock
 from newswriter.modules.imagetools import handleImageUpload, handleURL
 from newswriter.models.content import Article, ImageModel, Board
+from newswriter.models.permissions import ListarArticulosPermission
+from newswriter.models.permissions import ActualizarArticulosPermission
 from newswriter.models import _gen_uuid
 from newswriter.forms import UploadArticleForm
 from newswriter import filetools, db
@@ -34,23 +36,27 @@ def setupMenus():
     actions._external_url = "#!"
 
 
-@default.route('/')
+@default.route('/', defaults={"board_name": None})
+@default.route('/<board_name>')
 @register_menu(default, "actions.default.index", "Mis trabajos")
 @login_required
-def index():
+def index(board_name):
     page = request.args.get('page', 1, type=int)
-    ub = Board.getUserBoard(current_user)
-
-    if ub:
-        articulos = Article.query.filter(
-            Article.board_id == ub.name).order_by(
-                Article.created_on.desc()).paginate(page, per_page=4)
+    if board_name is None:
+        board = Board.getUserBoard(current_user)
     else:
-        # empty result set
-        articulos = {
-            "total": 0,
-            "items": []
-        }
+        board = Board.query.get_or_404(board_name)
+
+        # asegurarse de que el usuario puede leer este board
+        if ListarArticulosPermission(board.name).can() is False:
+            flash(f"Usted no tiene acceso al board {board_name}")
+            return redirect(url_for('.index'))
+
+
+    articulos = Article.query.filter(
+        Article.board_id == board.name).order_by(
+            Article.created_on.desc()).paginate(page, per_page=4)
+
 
     return render_template(
         'default/index.html', results=articulos)
@@ -65,6 +71,13 @@ def write(pkid):
         pkid = _gen_uuid()
 
     article = Article.query.get(pkid)
+
+    # Si el articulo exite el usuario necesita permisos para modificarlo
+    if article:
+        if ActualizarArticulosPermission(article.board_id).can() is False:
+            flash("Usted no puede hacer cambios")
+            return redirect(url_for('.index', board_name=article.board_id))
+    # --
 
     return render_template('default/write.html', pkid=pkid, article=article)
 
