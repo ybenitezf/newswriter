@@ -1,4 +1,6 @@
 from newswriter.models.security import Role, User, create_user as CreateUser
+from newswriter.models.content import Board
+from newswriter.models.permissions import BOARD_ALL_PERMS
 from newswriter.schemas import UserSchema, RoleSchema
 from newswriter import db
 from flask import Blueprint
@@ -95,3 +97,13 @@ def listar_roles():
     click.echo("Listado de roles")
     s = RoleSchema()
     pprint(s.dump(Role.query.all(), many=True), indent=2)
+
+
+@users_cmds.cli.command('fixboards')
+def fix_userboards():
+    """Ensure all users has a board"""
+    for u in User.query.all():
+        for p in BOARD_ALL_PERMS:
+            u.getUserRole().addPermission(
+                p, Board.createUserBoard(u).name, 'board')
+    db.session.commit()

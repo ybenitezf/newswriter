@@ -5,9 +5,9 @@
 {% block content %}
 <div class="works-list">
 
-  {% if results.items: %}
+  {% if results.total > 0 %}
 
-  {% for item in results.items: %}
+  {% for item in results.items %}
   <div class="card">
     <div class="card-content">
       <span class="card-title"><a href="{{ url_for('.preview', pkid=item.id) }}">{{ item.headline }}</a></span>

@@ -43,6 +43,8 @@ class Role(db.Model):
             self.permissions.append(p)
             self.query.session.add(self)
 
+        return p
+
     @classmethod
     def getUserEspecialRole(cls, user: 'User') -> 'Role':
         return cls.query.filter_by(
@@ -136,12 +138,7 @@ def create_user(
     user_board = content.Board.createUserBoard(user)
     # assing add user permissions on the board
     for p in BOARD_ALL_PERMS:
-        db.session.add(Permission(
-            name=p,
-            model_name='board',
-            record_id=user_board.id,
-            role_id=user_rol.id
-        ))
+        user_rol.addPermission(p, user_board.name, 'board')
     # --
 
     return user

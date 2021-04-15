@@ -41,9 +41,16 @@ def index():
     page = request.args.get('page', 1, type=int)
     ub = Board.getUserBoard(current_user)
 
-    articulos = Article.query.filter(
-        Article.board_id == ub.id).order_by(
-            Article.created_on.desc()).paginate(page, per_page=4)
+    if ub:
+        articulos = Article.query.filter(
+            Article.board_id == ub.name).order_by(
+                Article.created_on.desc()).paginate(page, per_page=4)
+    else:
+        # empty result set
+        articulos = {
+            "total": 0,
+            "items": []
+        }
 
     return render_template(
         'default/index.html', results=articulos)
