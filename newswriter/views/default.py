@@ -464,11 +464,13 @@ def articleEndPoint(pkid):
             # this is a new one and request.json['uuid'] is mandatory
             current_app.logger.debug("Creating a new Article")
             article = Article(
+                id=pkid,
                 headline=request.json['headline'],
                 credit_line=request.json['creditline'],
                 excerpt=request.json['summary'],
                 content=json.dumps(request.json['content']),
                 author_id=current_user.id,
+                board_id=Board.getUserBoard(current_user).name
             )
             article.keywords = request.json['keywords']
             db.session.add(article)
