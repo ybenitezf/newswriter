@@ -492,14 +492,18 @@ def articleEndPoint(pkid):
             return {"success": 1}
         else:
             # save article changes
-            current_app.logger.debug("Saving article {}".format(article.id))
-            article.headline = request.json['headline']
-            article.credit_line = request.json['creditline']
-            article.excerpt = request.json['summary']
-            article.content = json.dumps(request.json['content'])
-            article.keywords = request.json['keywords']
-            db.session.add(article)
-            db.session.commit()
+            if ActualizarArticulosPermission(article.board_id).can():
+                current_app.logger.debug(f"Saving article {article.id}")
+                article.headline = request.json['headline']
+                article.credit_line = request.json['creditline']
+                article.excerpt = request.json['summary']
+                article.content = json.dumps(request.json['content'])
+                article.keywords = request.json['keywords']
+                db.session.add(article)
+                db.session.commit()
+            else:
+                # no tiene permisos para modificiarlo
+                return {"success": 0}, 403
 
             return {"success": 1}
 
