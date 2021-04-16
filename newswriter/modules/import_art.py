@@ -4,9 +4,10 @@ Importar diferentes tipos de paquetes
 """
 from newswriter import ma, db
 from newswriter.schemas import ImageModelExportSchema
-from newswriter.models.content import Article, ImageModel
-from newswriter.models.security import User, Role, password_generator
+from newswriter.models.content import Article, ImageModel, Board
+from newswriter.models.security import User, password_generator
 from newswriter.models.security import create_user
+from newswriter.models.permissions import PonerArticulosPermission
 from flask import current_app, json
 from marshmallow import fields, validate
 import tempfile
@@ -64,6 +65,11 @@ class NewVersionExits(Exception):
     def __init__(self, article: Article) -> None:
         self.article = article
         super().__init__("Existe una versión más reciente")
+
+
+class NoAccessToBoard(Exception):
+    """El usuario no tiene permisos para importar el articulo"""
+    pass
 
 
 def importUserInfo(user_data) -> User:
@@ -146,7 +152,7 @@ def importAttaches(dirname: str, block_data: dict, uploads_dir: str) -> None:
     _l.debug(f"Imported {filename} to {dest}")
 
 
-def importItem(filename, uploads_dir):
+def importItem(filename: str, uploads_dir: str, user: User):
     _l = current_app.logger
 
     work_dir = tempfile.TemporaryDirectory()
@@ -171,17 +177,16 @@ def importItem(filename, uploads_dir):
                         raise NewVersionExits(actual)
 
                     # actualizar el articulo existente
-                    # TODO: ver el tema de los permisos y si esta en un board
-                    # ver que el usuario que lo importa tenga permisos en el 
-                    # board
-                    # --
-                    # actualizar el articulo
-                    _l.debug(f"actualizando {actual.id}")
-                    actual.headline = sm.get("headline")
-                    actual.credit_line = sm.get("credit_line")
-                    actual.excerpt = sm.get("excerpt")
-                    actual.keywords = sm.get("keywords")
-                    actual.content = json.dumps(sm.get("content"))
+                    if PonerArticulosPermission(actual.board_id).can():
+                        # actualizar el articulo
+                        _l.debug(f"Actualizando {actual.id}")
+                        actual.headline = sm.get("headline")
+                        actual.credit_line = sm.get("credit_line")
+                        actual.excerpt = sm.get("excerpt")
+                        actual.keywords = sm.get("keywords")
+                        actual.content = json.dumps(sm.get("content"))
+                    else:
+                        raise NoAccessToBoard
                     # --
                 else:
                     art_usr = importUserInfo(sm.get('author'))
@@ -195,6 +200,8 @@ def importItem(filename, uploads_dir):
                     actual.keywords = sm["keywords"]
                     actual.content = json.dumps(sm["content"])
                     actual.author = art_usr
+                    actual.board_id = Board.getUserBoard(user).name
+                    actual.created_on = sm["created_on"]
                 
                 # importar imagenes en los bloques
                 for cb in sm.get('content').get('blocks'):

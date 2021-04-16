@@ -8,7 +8,7 @@ from newswriter.forms import UploadArticleForm
 from newswriter import filetools, db
 from newswriter.modules.export import export_article
 from newswriter.modules.import_art import importItem, NotMetadataInFile
-from newswriter.modules.import_art import NewVersionExits
+from newswriter.modules.import_art import NewVersionExits, NoAccessToBoard
 from flask import Blueprint, render_template, request, current_app
 from flask import send_from_directory, url_for, abort, json
 from flask import Response, stream_with_context, flash
@@ -96,9 +96,15 @@ def import_article():
         f.save(fullname)
 
         try:
-            art = importItem(fullname, current_app.config['UPLOAD_FOLDER'])
+            art = importItem(
+                fullname, current_app.config['UPLOAD_FOLDER'], 
+                current_user)
             flash("Articulo importado")
             return redirect(url_for(".preview", pkid=art.id))
+        except NoAccessToBoard:
+            flash("No tienes permiso para reemplazar el articulo")
+            current_app.logger.exception(
+                "No tienes permiso para reemplazar el articulo")
         except NewVersionExits as e:
             url = url_for(".preview", pkid=e.article.id)
             current_app.logger.debug(
