@@ -68,7 +68,15 @@ class NewVersionExits(Exception):
 
 def importUserInfo(user_data) -> User:
     """Importar información de usuario"""
+    # test with id
     u = User.query.get(user_data.get("id"))
+    # test with username
+    if u is None:
+        byusername = User.query.filter(
+            (User.username == user_data.get("username"))
+        ).first()
+        u = None if byusername is None else byusername
+
     if u:
         # Ya tengo este usuario en la BD
         return u
