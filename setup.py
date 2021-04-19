@@ -14,7 +14,7 @@ def read(fname):
 
 setup(
     name='newswriter',
-    version='0.0.9',
+    version='0.1.0',
     url='https://github.com/ybenitezf/newswriter',
     license='GPL',
     author='Yoel Benítez Fonseca',
