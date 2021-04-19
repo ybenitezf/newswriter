@@ -1,9 +1,9 @@
 name: CI
 
-on: 
-  push:
-    tags:
-      - '*'
+on: push
+  # push:
+  #   tags:
+  #     - '*'
 
 jobs:
 
@@ -38,7 +38,7 @@ jobs:
   
   build-linux:
     needs: build-statics
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       FLASK_APP: newswriter:create_app()
       FLASK_ENV: development
