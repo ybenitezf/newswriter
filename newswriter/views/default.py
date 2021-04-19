@@ -14,11 +14,13 @@ from flask import send_from_directory, url_for, abort, json
 from flask import Response, stream_with_context, flash
 from flask_login import login_required, current_user
 from flask_menu import register_menu, current_menu
+import marshmallow.exceptions
 from werkzeug.utils import redirect, secure_filename
 from urllib.parse import urlparse
 from webpreview import OpenGraph
 from json.decoder import JSONDecodeError
 from pathlib import Path
+import datetime
 import tempfile
 import pathlib
 import os
@@ -101,6 +103,8 @@ def import_article():
                 current_user)
             flash("Articulo importado")
             return redirect(url_for(".preview", pkid=art.id))
+        except marshmallow.exceptions.ValidationError as e:
+            flash(f"Error en el formato del archivo {e}")
         except NoAccessToBoard:
             flash("No tienes permiso para reemplazar el articulo")
             current_app.logger.exception(
@@ -489,7 +493,8 @@ def articleEndPoint(pkid):
                 excerpt=request.json['summary'],
                 content=json.dumps(request.json['content']),
                 author_id=current_user.id,
-                board_id=Board.getUserBoard(current_user).name
+                board_id=Board.getUserBoard(current_user).name,
+                modified_on=datetime.datetime.utcnow()
             )
             article.keywords = request.json['keywords']
             db.session.add(article)
@@ -505,6 +510,7 @@ def articleEndPoint(pkid):
                 article.excerpt = request.json['summary']
                 article.content = json.dumps(request.json['content'])
                 article.keywords = request.json['keywords']
+                article.modified_on = datetime.datetime.utcnow()
                 db.session.add(article)
                 db.session.commit()
             else:

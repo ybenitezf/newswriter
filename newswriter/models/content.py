@@ -40,6 +40,7 @@ class Article(db.Model):
     board_id = db.Column(
         db.String(60), db.ForeignKey('board.name'), nullable=True)
     created_on = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    modified_on = db.Column(db.DateTime)
     author_id = db.Column(
         db.String(32), db.ForeignKey('user.id'), nullable=True)
     author = db.relationship('User', lazy=True)

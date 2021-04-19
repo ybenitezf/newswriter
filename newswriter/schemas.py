@@ -41,6 +41,7 @@ class ArticleExportSchema(ma.SQLAlchemySchema):
     excerpt = ma.auto_field()
     content = fields.Method('get_content')
     created_on = ma.auto_field()
+    modified_on = ma.auto_field()
     author = fields.Nested(UserSchema)
 
     def get_keywords(self, obj: Article):

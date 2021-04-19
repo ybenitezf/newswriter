@@ -138,7 +138,7 @@ def register():
             flash("Ya ese usuario esta registrado")
             redirect(url_for(".register"))
 
-        return redirect(url_for("default.index"))
+        return redirect(url_for(".edit_user_profile"))
     return render_template('users/register.html', form=form)
 
 
@@ -151,5 +151,5 @@ def edit_user_profile():
         form.populate_obj(obj)
         obj.save()
         flash("Perfil actualizado")
-        return redirect(url_for('.show_user_profile'))
+        return redirect(url_for('default.index'))
     return render_template('users/edit_profile.html', form=form, user=obj)

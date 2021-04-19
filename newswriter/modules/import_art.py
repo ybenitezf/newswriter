@@ -52,6 +52,7 @@ class ArticleSchema(ma.Schema):
     credit_line = fields.Str(missing='')
     excerpt = fields.Str(missing='')
     created_on = fields.DateTime(required=True)
+    modified_on = fields.DateTime()
     author = fields.Nested(UserSchema, required=True)
     content = fields.Nested(ContentSchema, required=True)
 
@@ -173,7 +174,7 @@ def importItem(filename: str, uploads_dir: str, user: User):
                 if actual is not None:
                     # ummm el articulo ya estaba, verificar si el que tengo
                     # es más nuevo que el que estoy importando
-                    if actual.created_on > sm.get('created_on'):
+                    if actual.modified_on > sm.get('modified_on'):
                         raise NewVersionExits(actual)
 
                     # actualizar el articulo existente
@@ -185,7 +186,10 @@ def importItem(filename: str, uploads_dir: str, user: User):
                         actual.excerpt = sm.get("excerpt")
                         actual.keywords = sm.get("keywords")
                         actual.content = json.dumps(sm.get("content"))
+                        actual.modified_on = sm.get('modified_on')
                     else:
+                        _l.debug(
+                            f"{user.name} no tiene permiso para actualizar")
                         raise NoAccessToBoard
                     # --
                 else:
@@ -202,6 +206,7 @@ def importItem(filename: str, uploads_dir: str, user: User):
                     actual.author = art_usr
                     actual.board_id = Board.getUserBoard(user).name
                     actual.created_on = sm["created_on"]
+                    actual.modified_on = sm['modified_on']
                 
                 # importar imagenes en los bloques
                 for cb in sm.get('content').get('blocks'):
@@ -226,6 +231,7 @@ def importItem(filename: str, uploads_dir: str, user: User):
                 db.session.commit()
                 return actual
             else:
+                _l.debug(f"Missing META-INFO.json in {filename}")
                 raise NotMetadataInFile
     finally:
         _l.debug(f"Cleaning up {work_dir.name}")
