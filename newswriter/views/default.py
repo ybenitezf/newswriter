@@ -1,22 +1,33 @@
 from newswriter.modules.editorjs import renderBlock
 from newswriter.modules.imagetools import handleImageUpload, handleURL
-from newswriter.models.content import Article, ImageModel
+from newswriter.models.content import Article, ImageModel, Board
+from newswriter.models.permissions import ListarArticulosPermission
+from newswriter.models.permissions import ActualizarArticulosPermission
 from newswriter.models import _gen_uuid
+from newswriter.forms import UploadArticleForm
 from newswriter import filetools, db
+from newswriter.modules.export import export_article
+from newswriter.modules.import_art import importItem, NotMetadataInFile
+from newswriter.modules.import_art import NewVersionExits, NoAccessToBoard
 from flask import Blueprint, render_template, request, current_app
 from flask import send_from_directory, url_for, abort, json
+from flask import Response, stream_with_context, flash
 from flask_login import login_required, current_user
 from flask_menu import register_menu, current_menu
-from werkzeug.utils import secure_filename
+import marshmallow.exceptions
+from werkzeug.utils import redirect, secure_filename
 from urllib.parse import urlparse
 from webpreview import OpenGraph
 from json.decoder import JSONDecodeError
+from pathlib import Path
+import datetime
 import tempfile
 import pathlib
 import os
 import zipfile
 
 default = Blueprint('default', __name__, url_prefix='/escritorio')
+
 
 @default.before_app_first_request
 def setupMenus():
@@ -26,15 +37,28 @@ def setupMenus():
     actions._endpoint = None
     actions._external_url = "#!"
 
-@default.route('/')
+
+@default.route('/', defaults={"board_name": None})
+@default.route('/<board_name>')
 @register_menu(default, "actions.default.index", "Mis trabajos")
 @login_required
-def index():
+def index(board_name):
     page = request.args.get('page', 1, type=int)
+    if board_name is None:
+        board = Board.getUserBoard(current_user)
+    else:
+        board = Board.query.get_or_404(board_name)
+
+        # asegurarse de que el usuario puede leer este board
+        if ListarArticulosPermission(board.name).can() is False:
+            flash(f"Usted no tiene acceso al board {board_name}")
+            return redirect(url_for('.index'))
+
 
     articulos = Article.query.filter(
-        Article.author_id == current_user.id).order_by(
+        Article.board_id == board.name).order_by(
             Article.created_on.desc()).paginate(page, per_page=4)
+
 
     return render_template(
         'default/index.html', results=articulos)
@@ -50,14 +74,92 @@ def write(pkid):
 
     article = Article.query.get(pkid)
 
+    # Si el articulo exite el usuario necesita permisos para modificarlo
+    if article:
+        if ActualizarArticulosPermission(article.board_id).can() is False:
+            flash("Usted no puede hacer cambios")
+            return redirect(url_for('.index', board_name=article.board_id))
+    # --
+
     return render_template('default/write.html', pkid=pkid, article=article)
 
 
-@default.route('preview/<pkid>')
+@default.route('/importar', methods=['GET', 'POST'])
+@register_menu(default, "actions.default.import_article", "Importar")
+@login_required
+def import_article():
+    """Seleccionar paquete a importar"""
+    form = UploadArticleForm()
+
+    if form.validate_on_submit():
+        f = form.archive.data
+        filename = secure_filename(f.filename)
+        fullname = os.path.join(tempfile.mkdtemp(), filename)
+        f.save(fullname)
+
+        try:
+            art = importItem(
+                fullname, current_app.config['UPLOAD_FOLDER'], 
+                current_user)
+            flash("Articulo importado")
+            return redirect(url_for(".preview", pkid=art.id))
+        except marshmallow.exceptions.ValidationError as e:
+            flash(f"Error en el formato del archivo {e}")
+        except NoAccessToBoard:
+            flash("No tienes permiso para reemplazar el articulo")
+            current_app.logger.exception(
+                "No tienes permiso para reemplazar el articulo")
+        except NewVersionExits as e:
+            url = url_for(".preview", pkid=e.article.id)
+            current_app.logger.debug(
+                f"Ya existe una versión más reciente de ese trabajo: {url}")
+        except NotMetadataInFile:
+            current_app.logger.exception(
+                "No existe el archivo META-INFO.json")
+            flash("META-INFO file missing or corruct")
+        except zipfile.BadZipFile:
+            current_app.logger.exception("Bad zip file")
+            flash("El archivo esta corructo")
+        except UnicodeDecodeError:
+            current_app.logger.exception('MATA-INFO file missing or corruct')
+            flash("No se puede leer el archivo")
+        except JSONDecodeError:
+            flash("No se puede leer el archivo")
+            current_app.logger.exception('MATA-INFO file missing or corruct')
+        finally:
+            current_app.logger.debug("Removing uploaded file")
+            filetools.safe_remove(fullname)
+
+    return render_template('default/import_form.html', form=form)
+
+
+@default.route('/preview/<pkid>')
 @login_required
 def preview(pkid):
     article = Article.query.get_or_404(pkid)
     return render_template('default/preview.html', article=article)
+
+
+@default.route('/download/<pkid>')
+@login_required
+def download_article(pkid):
+    article = Article.query.get_or_404(pkid)
+    file_name = export_article(article)
+    file_handle = open(file_name, 'rb')
+
+    def stream_and_remove():
+        yield from file_handle
+        file_handle.close()
+        os.remove(file_name)
+
+    return Response(
+        stream_with_context(stream_and_remove()),
+        headers={
+            'Content-Type': 'application/zip',
+            'Content-Disposition': 'attachment; filename="{}"'.format(
+                Path(file_name).name)
+        }
+    )
 
 
 @default.route('/assets/images/<filename>')
@@ -97,7 +199,7 @@ def upload_photoarchive():
         im = None
 
         workdir = tempfile.TemporaryDirectory()
-        
+
         try:
             with zipfile.ZipFile(fullname, 'r') as zf:
                 if 'META-INFO.json' in zf.namelist():
@@ -117,7 +219,7 @@ def upload_photoarchive():
                             image_file = os.path.join(
                                 workdir.name, file_in_package)
                         im = handleImageUpload(
-                            image_data.get('md5'), image_file, current_user.id, 
+                            image_data.get('md5'), image_file, current_user.id,
                             current_app.config['UPLOAD_FOLDER'])
                         if im.store_data is None:
                             im.store_data = json.dumps(image_data)
@@ -144,7 +246,7 @@ def upload_photoarchive():
             filetools.safe_remove(fullname)
 
         if im is not None:
-            
+
             caption = ""
             if isinstance(im.getStoreData().get('excerpt'), dict):
                 blocks = im.getStoreData().get('excerpt').get('blocks')
@@ -155,9 +257,9 @@ def upload_photoarchive():
                 "success": 1,
                 "file": {
                     "url": url_for(
-                        'default.uploaded_image', 
-                        filename=im.filename, 
-                        _external=True),
+                        'default.uploaded_image',
+                        filename=im.filename),
+                    "filename": im.filename,
                     "md5sum": im.id,
                     "width": im.width or 0,
                     "height": im.height or 0,
@@ -198,7 +300,7 @@ def upload_image():
         md5sum = filetools.md5(fullname)
 
         im = handleImageUpload(
-            md5sum, fullname, current_user.id, 
+            md5sum, fullname, current_user.id,
             current_app.config['UPLOAD_FOLDER'])
         db.session.add(im)
         db.session.commit()
@@ -209,10 +311,9 @@ def upload_image():
             "success": 1,
             "file": {
                 "url": url_for(
-                    'default.uploaded_image', 
-                    filename=im.filename, 
-                    _external=True),
-                # TODO: hacer esto con Marshmallow
+                    'default.uploaded_image',
+                    filename=im.filename),
+                "filename": im.filename,
                 "width": im.width or 0,
                 "height": im.height or 0,
                 "mode": im.orientation or "",
@@ -220,7 +321,7 @@ def upload_image():
             },
             "credit": "Foto de {}".format(im.uploader.name)
         }
-    
+
     current_app.logger.debug("Filename not valid")
     return {"success": 0}
 
@@ -284,8 +385,8 @@ def fetch_image():
         credit = "Tomada de Internet"
 
     try:
-        im = handleURL(url, current_user.id, 
-            current_app.config['UPLOAD_FOLDER'])
+        im = handleURL(url, current_user.id,
+                       current_app.config['UPLOAD_FOLDER'])
         db.session.add(im)
         db.session.commit()
     except Exception:
@@ -297,9 +398,9 @@ def fetch_image():
         "success": 1,
         "file": {
             "url": url_for(
-                'default.uploaded_image', 
-                filename=im.filename, 
-                _external=True),
+                'default.uploaded_image',
+                filename=im.filename),
+            "filename": im.filename,
             "width": im.width or 0,
             "height": im.height or 0,
             "mode": im.orientation or "",
@@ -322,7 +423,7 @@ def fetch_link():
                     'og:title', 'og:description', 'og:image', 'og:site_name'])
 
             im = handleURL(
-                info.image, current_user.id, 
+                info.image, current_user.id,
                 current_app.config['UPLOAD_FOLDER'])
             db.session.add(im)
             db.session.commit()
@@ -334,9 +435,9 @@ def fetch_link():
                     'site_name': info.site_name,
                     'image': {
                         'url': url_for(
-                            'default.uploaded_image', 
-                            filename=im.filename, 
-                            _external=True),
+                            'default.uploaded_image',
+                            filename=im.filename),
+                        "filename": im.filename,
                         "width": im.width or 0,
                         "height": im.height or 0,
                         "mode": im.orientation or "",
@@ -348,7 +449,7 @@ def fetch_link():
             _l.exception("Ocurrio un error procesando el enlace")
             return {'success': 0}
 
-    return {"success" : 0}
+    return {"success": 0}
 
 
 @default.route('/article/<pkid>', methods=['GET', 'POST'])
@@ -386,11 +487,14 @@ def articleEndPoint(pkid):
             # this is a new one and request.json['uuid'] is mandatory
             current_app.logger.debug("Creating a new Article")
             article = Article(
+                id=pkid,
                 headline=request.json['headline'],
                 credit_line=request.json['creditline'],
                 excerpt=request.json['summary'],
                 content=json.dumps(request.json['content']),
                 author_id=current_user.id,
+                board_id=Board.getUserBoard(current_user).name,
+                modified_on=datetime.datetime.utcnow()
             )
             article.keywords = request.json['keywords']
             db.session.add(article)
@@ -399,14 +503,19 @@ def articleEndPoint(pkid):
             return {"success": 1}
         else:
             # save article changes
-            current_app.logger.debug("Saving article {}".format(article.id))
-            article.headline = request.json['headline']
-            article.credit_line = request.json['creditline']
-            article.excerpt = request.json['summary']
-            article.content = json.dumps(request.json['content'])
-            article.keywords = request.json['keywords']
-            db.session.add(article)
-            db.session.commit()
+            if ActualizarArticulosPermission(article.board_id).can():
+                current_app.logger.debug(f"Saving article {article.id}")
+                article.headline = request.json['headline']
+                article.credit_line = request.json['creditline']
+                article.excerpt = request.json['summary']
+                article.content = json.dumps(request.json['content'])
+                article.keywords = request.json['keywords']
+                article.modified_on = datetime.datetime.utcnow()
+                db.session.add(article)
+                db.session.commit()
+            else:
+                # no tiene permisos para modificiarlo
+                return {"success": 0}, 403
 
             return {"success": 1}
 

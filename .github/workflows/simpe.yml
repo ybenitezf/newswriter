@@ -1,6 +1,6 @@
 name: CI
 
-on: 
+on:
   push:
     tags:
       - '*'
@@ -38,7 +38,7 @@ jobs:
   
   build-linux:
     needs: build-statics
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       FLASK_APP: newswriter:create_app()
       FLASK_ENV: development
@@ -65,7 +65,7 @@ jobs:
           flask digest compile
       - name: Make binary
         run: |
-          pyinstaller --hiddenimport=celery.fixups.django \
+          pyinstaller --onefile --hiddenimport=celery.fixups.django \
             --hiddenimport='celery.fixups' \
             --add-data 'newswriter/templates:newswriter/templates' \
             --add-data 'newswriter/static:newswriter/static' \
@@ -147,7 +147,7 @@ jobs:
           flask digest compile
       - name: Make binary
         run: |
-          pyinstaller --hiddenimport="celery.fixups.django" `
+          pyinstaller --onefile --hiddenimport="celery.fixups.django" `
             --hiddenimport="celery.fixups" `
             --add-data "newswriter/templates;newswriter/templates" `
             --add-data "newswriter/static;newswriter/static" `

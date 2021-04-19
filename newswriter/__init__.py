@@ -72,6 +72,11 @@ def create_app(config='newswriter.config.Config'):
             app.instance_path, 'myindexes')
         pathlib.Path(os.path.join(app.instance_path, 'myindexes')).mkdir(
             parents=True, exist_ok=True)
+    # crear directorio para imagenes
+    pathlib.Path(
+        os.path.join(
+            app.config['UPLOAD_FOLDER'], 'images')
+        ).mkdir(parents=True, exist_ok=True)
     logs.init_app(app)
 
     app.wsgi_app = ProxyFix(

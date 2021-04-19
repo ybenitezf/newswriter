@@ -1,10 +1,12 @@
 from newswriter import db
 from newswriter.models import _gen_uuid
+from newswriter.models.permissions import BOARD_ALL_PERMS
 from flask_login import UserMixin, current_user
 from flask_principal import Need, identity_loaded, RoleNeed, UserNeed, ItemNeed
 from flask_diced import persistence_methods
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import string
+import random
 
 user_roles = db.Table(
     'user_roles',
@@ -41,6 +43,8 @@ class Role(db.Model):
             self.permissions.append(p)
             self.query.session.add(self)
 
+        return p
+
     @classmethod
     def getUserEspecialRole(cls, user: 'User') -> 'Role':
         return cls.query.filter_by(
@@ -59,6 +63,8 @@ class Role(db.Model):
             user.roles.append(r)
             db.session.add(r)
             db.session.add(user)
+
+        return r
 
 
 class Permission(db.Model):
@@ -105,18 +111,61 @@ class User(UserMixin, db.Model):
         return self.credit_line or self.name or self.username
 
 
-def create_user(username: str, password: str, name='', email='') -> User:
+def create_user(
+    username: str,
+    password: str,
+    name='',
+    email='',
+    credit_line='',
+    id=None
+) -> User:
     """Crear un usuario"""
-    user = User()
+    if id is None:
+        user = User()
+    else:
+        user = User(id=id)
     user.name = name
     user.set_password(password)
     user.username = username
     user.email = email
+    user.credit_line = credit_line
 
     # crear grupo especial para el usuario
-    Role.createUserEspecialRole(user)
+    user_rol = Role.createUserEspecialRole(user)
+
+    # crear el board personal del usuario
+    from newswriter.models import content  # avoid circular import
+    user_board = content.Board.createUserBoard(user)
+    # assing add user permissions on the board
+    for p in BOARD_ALL_PERMS:
+        user_rol.addPermission(p, user_board.name, 'board')
+    # --
 
     return user
+
+
+def password_generator(length=8):
+    '''
+    Generates a random password having the specified length
+    :length -> length of password to be generated. Defaults to 8
+        if nothing is specified.
+    :returns string <class 'str'>
+    '''
+    LETTERS = string.ascii_letters
+    NUMBERS = string.digits
+    PUNCTUATION = string.punctuation
+
+    # create alphanumerical from string constants
+    printable = f'{LETTERS}{NUMBERS}{PUNCTUATION}'
+
+    # convert printable from string to list and shuffle
+    printable = list(printable)
+    random.shuffle(printable)
+
+    # generate random password and convert to string
+    random_password = random.choices(printable, k=length)
+    random_password = ''.join(random_password)
+    return random_password
 
 
 @identity_loaded.connect

@@ -2,12 +2,26 @@
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 from newswriter import db
 from newswriter.models import _gen_uuid
+from newswriter.models.security import User
 from datetime import datetime
 import json
 
 class Board(db.Model):
     name = db.Column(db.String(60), primary_key=True)
     articles = db.relationship('Article', backref='board', lazy=True)
+
+    @classmethod
+    def getUserBoard(cls, user: User) -> 'Board':
+        return Board.query.filter_by(name=f"{user.username}_ub").first()
+
+    @classmethod
+    def createUserBoard(cls, user: User):
+        b = cls.getUserBoard(user)
+        if b is None:
+            b = Board(name=f"{user.username}_ub")
+            db.session.add(b)
+
+        return b
 
 
 class IsInComparator(Comparator):
@@ -26,6 +40,7 @@ class Article(db.Model):
     board_id = db.Column(
         db.String(60), db.ForeignKey('board.name'), nullable=True)
     created_on = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    modified_on = db.Column(db.DateTime)
     author_id = db.Column(
         db.String(32), db.ForeignKey('user.id'), nullable=True)
     author = db.relationship('User', lazy=True)

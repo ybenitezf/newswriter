@@ -56,6 +56,7 @@ setup(
         'marshmallow-sqlalchemy',
         'celery',
         'Whoosh',
+        'python-slugify',
         'adelacommon @ https://github.com/ybenitezf/adela-common/releases/download/v0.0.3/adelacommon-0.0.3-py3-none-any.whl'
     ],
     classifiers=[

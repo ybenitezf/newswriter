@@ -50,9 +50,9 @@
       <i class="large material-icons">save</i>
     </a>
     <ul>
-      <li><a class="btn-floating red darken-2" title="Borrar"><i class="material-icons">delete</i></a></li>
+      <li><a class="btn-floating red darken-2 disabled" title="Borrar"><i class="material-icons">delete</i></a></li>
       <li><a class="btn-floating" href="{{ url_for('.preview', pkid=pkid) }}" title="Vista previa"><i class="material-icons">pageview</i></a></li>
-      <li><a class="btn-floating" title="Enviar"><i class="material-icons">send</i></a></li>
+      <li><a class="btn-floating"  href="{{ url_for('.download_article', pkid=pkid) }}" title="Descargar articulo"><i class="material-icons">cloud_download</i></a></li>
     </ul>
   </div>
 
