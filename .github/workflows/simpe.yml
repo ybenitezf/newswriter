@@ -1,9 +1,9 @@
 name: CI
 
-on: push
-  # push:
-  #   tags:
-  #     - '*'
+on:
+  push:
+    tags:
+      - '*'
 
 jobs:
 
@@ -65,7 +65,7 @@ jobs:
           flask digest compile
       - name: Make binary
         run: |
-          pyinstaller --hiddenimport=celery.fixups.django \
+          pyinstaller --onefile --hiddenimport=celery.fixups.django \
             --hiddenimport='celery.fixups' \
             --add-data 'newswriter/templates:newswriter/templates' \
             --add-data 'newswriter/static:newswriter/static' \
@@ -147,7 +147,7 @@ jobs:
           flask digest compile
       - name: Make binary
         run: |
-          pyinstaller --hiddenimport="celery.fixups.django" `
+          pyinstaller --onefile --hiddenimport="celery.fixups.django" `
             --hiddenimport="celery.fixups" `
             --add-data "newswriter/templates;newswriter/templates" `
             --add-data "newswriter/static;newswriter/static" `
