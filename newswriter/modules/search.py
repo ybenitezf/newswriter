@@ -1,7 +1,9 @@
-from newswriter import celery, db
+from newswriter import db
+# from newswriter import celery
 from whoosh.searching import Hit, ResultsPage
 from whoosh.filedb.filestore import FileStorage
 from flask import current_app
+
 
 def index_document(indice: str, data: dict):
     store = FileStorage(indice)
@@ -10,9 +12,10 @@ def index_document(indice: str, data: dict):
     with ix.writer() as writer:
         writer.update_document(**data)
 
-@celery.task
-def index_document_async(*args, **kwargs):
-    index_document(*args, **kwargs)
+
+# @celery.task
+# def index_document_async(*args, **kwargs):
+#     index_document(*args, **kwargs)
 
 
 class PaginaBusqueda(object):
@@ -24,11 +27,11 @@ class PaginaBusqueda(object):
             self._objects = self._getObjectsFromResults()
         self.pagenum = self._res.pagenum
 
-    def next(self):       
+    def next(self):
         return self.pagenum + 1 if self.has_next() else self.pagenum
-    
+
     def prev(self):
-        return self.pagenum - 1  if self.has_prev() else self.pagenum
+        return self.pagenum - 1 if self.has_prev() else self.pagenum
 
     def is_empty(self):
         return self._res.results.is_empty()
@@ -54,7 +57,7 @@ class PaginaBusqueda(object):
 
     def getObjectIdentifier(self) -> 'str':
         """Atributo en los resultados que identifica al objeto
-        
+
         Para poder ser usando en getObjectsFromResults
         """
         raise NotImplementedError

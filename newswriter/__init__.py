@@ -10,7 +10,7 @@ from flask_static_digest import FlaskStaticDigest
 from flask_menu import register_menu, Menu
 from apifairy import APIFairy
 from flask_marshmallow import Marshmallow
-from celery import Celery
+# from celery import Celery
 from flask import Flask, redirect
 from werkzeug.middleware.proxy_fix import ProxyFix
 import pathlib
@@ -30,7 +30,7 @@ cache = Cache()
 flask_statics = FlaskStaticDigest()
 apifairy = APIFairy()
 ma = Marshmallow()
-celery = Celery(__name__)
+# celery = Celery(__name__)
 # Breadcrumbs is a subclass of flask_menu.Menu
 menu = Menu()
 
@@ -99,8 +99,8 @@ def create_app(config='newswriter.config.Config'):
     ma.init_app(app)
     menu.init_app(app)
     apifairy.init_app(app)
-    if app.config.get('CELERY_ENABLED'):
-        init_celery(celery, app)
+    # if app.config.get('CELERY_ENABLED'):
+    #     init_celery(celery, app)
 
     # incluir modulos y rutas
     from newswriter.views.default import default
@@ -146,12 +146,12 @@ def create_app(config='newswriter.config.Config'):
     return app
 
 
-def init_celery(instance, app):
-    instance.conf.update(app.config)
+# def init_celery(instance, app):
+#     instance.conf.update(app.config)
 
-    class ContextTask(instance.Task):
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return self.run(*args, **kwargs)
+#     class ContextTask(instance.Task):
+#         def __call__(self, *args, **kwargs):
+#             with app.app_context():
+#                 return self.run(*args, **kwargs)
 
-    instance.Task = ContextTask
+#     instance.Task = ContextTask

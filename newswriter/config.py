@@ -41,9 +41,9 @@ class Config(object):
     # --
     DEBUG_TB_INTERCEPT_REDIRECTS = False
 
-    CELERY_ENABLED = (os.getenv('CELERY_ENABLED', 'False') == 'True')
-    broker_url = os.getenv('CELERY_BROKER_URL') or 'redis://localhost:6379'
-    result_backend = os.getenv('CELERY_RESULT_BACKEND') or None
+    # CELERY_ENABLED = (os.getenv('CELERY_ENABLED', 'False') == 'True')
+    # broker_url = os.getenv('CELERY_BROKER_URL') or 'redis://localhost:6379'
+    # result_backend = os.getenv('CELERY_RESULT_BACKEND') or None
 
 class TestConfig(Config):
     TESTING = True

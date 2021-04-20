@@ -1,3 +1,4 @@
-from newswriter import create_app, celery
+from newswriter import create_app
+# from newswriter import celery
 
 app = create_app()

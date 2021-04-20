@@ -60,5 +60,5 @@ flask deploy db-upgrade
 ## Generar instalador
 
 ```bash
-pyinstaller --onefile --hiddenimport=celery.fixups.django --hiddenimport='celery.fixups' --add-data 'newswriter/templates:newswriter/templates' --add-data 'newswriter/static:newswriter/static' --add-data 'newswriter/migrations:newswriter/migrations' --hiddenimport=newswriter.config newswritercli.py
+pyinstaller --onefile --add-data 'newswriter/templates:newswriter/templates' --add-data 'newswriter/static:newswriter/static' --add-data 'newswriter/migrations:newswriter/migrations' --hiddenimport=newswriter.config newswritercli.py
 ```
