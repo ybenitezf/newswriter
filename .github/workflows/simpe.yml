@@ -65,7 +65,7 @@ jobs:
           flask digest compile
       - name: Make binary
         run: |
-          pyinstaller --onefile 
+          pyinstaller --onefile \
             --add-data 'newswriter/templates:newswriter/templates' \
             --add-data 'newswriter/static:newswriter/static' \
             --add-data 'newswriter/migrations:newswriter/migrations' \
