@@ -39,13 +39,9 @@ def create_app(config='newswriter.config.Config'):
     """Inicializar la aplicación"""
     if getattr(sys, 'frozen', False):
         # para pyinstaller
-        # template_folder = os.path.join(sys._MEIPASS, 'templates')
-        # static_folder = os.path.join(sys._MEIPASS, 'static')
         instance_path = os.path.join(os.path.expanduser("~"), "newswriter")
         app = Flask(
             __name__, 
-            # template_folder=template_folder,
-            # static_folder=static_folder, 
             instance_path=instance_path)
         app.config['PYINSTALLER'] = True
     else:
@@ -99,12 +95,11 @@ def create_app(config='newswriter.config.Config'):
     ma.init_app(app)
     menu.init_app(app)
     apifairy.init_app(app)
-    # if app.config.get('CELERY_ENABLED'):
-    #     init_celery(celery, app)
 
     # incluir modulos y rutas
     from newswriter.views.default import default
     from newswriter.views.users import users_bp
+    from newswriter.views.admin import admin_role, admin_permissions
     from newswriter.searchcommands import cmd as search_cmd
     from newswriter.admin_commands import users_cmds
     from adelacommon.deploy import deploy_cmd
@@ -112,6 +107,10 @@ def create_app(config='newswriter.config.Config'):
     # registrar los blueprints
     app.register_blueprint(default)
     app.register_blueprint(users_bp)
+    # admin crud
+    app.register_blueprint(admin_role)
+    app.register_blueprint(admin_permissions)
+    # --
     app.register_blueprint(search_cmd)
     app.register_blueprint(users_cmds)
     app.register_blueprint(deploy_cmd)
@@ -145,13 +144,3 @@ def create_app(config='newswriter.config.Config'):
 
     return app
 
-
-# def init_celery(instance, app):
-#     instance.conf.update(app.config)
-
-#     class ContextTask(instance.Task):
-#         def __call__(self, *args, **kwargs):
-#             with app.app_context():
-#                 return self.run(*args, **kwargs)
-
-#     instance.Task = ContextTask

@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block page_header %}
+<nav>
+    <div class="nav-wrapper">
+    <div class="col s12 mx-2">
+        {% block breadcrumbs %}
+        <a href="{{ url_for('default.index') }}" class="breadcrumb">Inicio</a>
+        {% endblock breadcrumbs%}
+    </div>
+    </div>
+</nav>
+{% endblock page_header %}

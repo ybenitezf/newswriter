@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}Adminstración de permisos{% endblock %}
+
+{% block content %}
+<h4>Listado de permisos</h4>
+
+<table class="striped">
+    <thead>
+        <tr>
+            <th>Permiso</th>
+            <th>Rol / Ususario</th>
+            <th>Modelo</th>
+            <th>Objeto</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in permission_list %}
+        <tr>
+            <td>{{ p.name }}</td>
+            {% if getRole(p.role_id).isPersonal() %}
+            <td>{{ getRole(p.role_id).getUsername() }}</td>
+            {% else %}
+            <td>{{ getRole(p.role_id).name }}</td>
+            {% endif %}
+            <td>{{ p.model_name }}</td>
+            <td>{{ p.record_id }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

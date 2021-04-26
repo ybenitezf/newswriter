@@ -19,6 +19,7 @@ user_roles = db.Table(
 )
 
 
+@persistence_methods(db)
 class Role(db.Model):
     id = db.Column(db.String(32), primary_key=True, default=_gen_uuid)
     name = db.Column(db.String(80), unique=True)
@@ -44,6 +45,18 @@ class Role(db.Model):
             self.query.session.add(self)
 
         return p
+
+    def isPersonal(self) -> bool:
+        return '_role' in self.name
+
+    def getUsername(self) -> str:
+        """Returns username for especial user roles"""
+        if self.isPersonal() is False:
+            raise ValueError
+
+        return User.query.filter_by(
+            username=self.name.split("_role")[0]
+        ).first().username
 
     @classmethod
     def getUserEspecialRole(cls, user: 'User') -> 'Role':

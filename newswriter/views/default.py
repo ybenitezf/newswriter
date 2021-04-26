@@ -61,7 +61,10 @@ def index(board_name):
 
 
     return render_template(
-        'default/index.html', results=articulos)
+        'default/index.html', 
+        results=articulos, board=board,
+        is_personal=("_ub" in board.name)
+    )
 
 
 @default.route('/escribir', defaults={"pkid": None})
