@@ -1,9 +1,10 @@
 from newswriter.models import security
 from flask_diced import Diced
 from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 from flask_wtf import FlaskForm
 from flask import redirect, flash, render_template
+from typing import List
 
 
 class RoleCreateForm(FlaskForm):
@@ -15,16 +16,31 @@ class RoleCreateForm(FlaskForm):
 class RoleDeleteForm(FlaskForm):
     submit = SubmitField('Eliminar rol')
 
+class RevokeRoleForm(FlaskForm):
+    submit = SubmitField('Quitar del grupo')
+
+
+class AddMememberForm(FlaskForm):
+    username = StringField('Usuario', validators=[DataRequired()])
+    submit = SubmitField('Agregar')
+
+    def validate_username(form, field):
+        chk_usr = security.User.query.filter_by(
+            username=field.data).first()
+
+        if chk_usr is None:
+            raise ValidationError('No existe el usuario')
+
 
 class RoleDiced(Diced):
     model = security.Role
     create_form_class = RoleCreateForm
     edit_form_class = RoleCreateForm
     delete_form_class = RoleDeleteForm
-    exclude_views = ('detail', )
 
     edit_rule = '/<pk>/edit'
     delete_rule = '/<pk>/delete'
+    detail_rule = '/<pk>/members'
 
     def edit_view(self, pk):
         """edit view function
