@@ -33,20 +33,23 @@ Administración - Roles
             <td>{{ role.description }}</td>
             <td>
                 {% if role.isPersonal() is false %}
-                <a href="{{ url_for('admin_role.edit', pk=role.id) }}" class="waves-effect waves-light btn-small" title="Editar">
+                <a href="{{ url_for('admin_role.edit', pk=role.id) }}" class="waves-effect waves-light btn-small"
+                    title="Editar">
                     <i class="material-icons">edit</i>
                 </a>
-                <a href="{{ url_for('admin_role.delete', pk=role.id) }}" class="waves-effect waves-light btn-small red" title="Eliminar">
+                <a href="{{ url_for('admin_role.delete', pk=role.id) }}" class="waves-effect waves-light btn-small red"
+                    title="Eliminar">
                     <i class="material-icons">delete</i>
                 </a>
                 {% endif %}
             </td>
             <td>
-                <a class="waves-effect waves-light btn-small" title="Permisos">
+                <a href="{{ url_for('admin_perms.index', role_id=role.id) }}" class="waves-effect waves-light btn-small" title="Permisos">
                     <i class="material-icons">security</i>
                 </a>
                 {% if role.isPersonal() is false %}
-                <a href="{{ url_for('admin_role.detail', pk=role.id) }}" class="waves-effect waves-light btn-small" title="Miembros">
+                <a href="{{ url_for('admin_role.detail', pk=role.id) }}" class="waves-effect waves-light btn-small"
+                    title="Miembros">
                     <i class="material-icons">people</i>
                 </a>
                 {% endif %}

@@ -80,6 +80,7 @@ class Role(db.Model):
         return r
 
 
+@persistence_methods(db)
 class Permission(db.Model):
     id = db.Column(db.String(32), primary_key=True, default=_gen_uuid)
     # the machine readable permission name

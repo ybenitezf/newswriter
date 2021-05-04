@@ -1,15 +1,28 @@
-{% extends 'layout.html' %}
+{% extends 'permission/layout.html' %}
 
 {% block page_title %}Adminstración de permisos{% endblock %}
 
+{% block breadcrumbs %}
+{{ super() }}
+<a href="{{ url_for('admin_perms.index', role_id=role.id) }}" class="breadcrumb">Permisos - {{role.name}}</a>
+{% endblock breadcrumbs %}
+
 {% block content %}
-<h4>Listado de permisos</h4>
+<h4>Listado de permisos para {{ role.name }}</h4>
+
+<p>
+    <a class="waves-effect waves-light btn" href="{{ url_for('admin_perms.create', role_id=role.id) }}"
+        title="Agregar permiso">
+        <i class="material-icons left">add</i>
+        Permiso
+    </a>
+</p>
+
 
 <table class="striped">
     <thead>
         <tr>
             <th>Permiso</th>
-            <th>Rol / Ususario</th>
             <th>Modelo</th>
             <th>Objeto</th>
         </tr>
@@ -18,15 +31,18 @@
         {% for p in permission_list %}
         <tr>
             <td>{{ p.name }}</td>
-            {% if getRole(p.role_id).isPersonal() %}
-            <td>{{ getRole(p.role_id).getUsername() }}</td>
-            {% else %}
-            <td>{{ getRole(p.role_id).name }}</td>
-            {% endif %}
             <td>{{ p.model_name }}</td>
             <td>{{ p.record_id }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<p>
+    <a class="waves-effect waves-light btn" href="{{ url_for('admin_perms.create', role_id=role.id) }}"
+        title="Agregar permiso">
+        <i class="material-icons left">add</i>
+        Permiso
+    </a>
+</p>
 {% endblock %}
