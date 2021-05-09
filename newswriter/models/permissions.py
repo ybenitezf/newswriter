@@ -1,5 +1,6 @@
 from newswriter.permissions import AdminRolNeed
 from flask_principal import Permission, ItemNeed, Need
+from typing import Any, List
 
 # Boards
 LISTAR_CONTENIDO = 'listar::articulo'
@@ -47,3 +48,16 @@ class PonerArticulosPermission(Permission):
     def __init__(self, board_name):
         need = ItemNeed(PONER_CONTENIDO, board_name, 'board')
         super().__init__(need, AdminRolNeed, PonerArticulosNeed)
+
+
+class BoardPermissionHelpers(object):
+
+    @classmethod
+    def getPermissionLabel(cls, k: str) -> str:
+        return BOARD_PERMS_DESCRIPTIONS[k]
+
+    @classmethod
+    def getFormChoices(cls) -> List[Any]:
+        return [
+            (k, cls.getPermissionLabel(k)) for k in BOARD_PERMS_DESCRIPTIONS
+        ]

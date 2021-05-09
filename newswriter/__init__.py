@@ -8,6 +8,7 @@ from flask_principal import Principal
 from flask_caching import Cache
 from flask_static_digest import FlaskStaticDigest
 from flask_menu import register_menu, Menu
+from flask_wtf import CSRFProtect
 from apifairy import APIFairy
 from flask_marshmallow import Marshmallow
 # from celery import Celery
@@ -30,6 +31,7 @@ cache = Cache()
 flask_statics = FlaskStaticDigest()
 apifairy = APIFairy()
 ma = Marshmallow()
+csrf = CSRFProtect()
 # celery = Celery(__name__)
 # Breadcrumbs is a subclass of flask_menu.Menu
 menu = Menu()
@@ -94,6 +96,7 @@ def create_app(config='newswriter.config.Config'):
     flask_statics.init_app(app)
     ma.init_app(app)
     menu.init_app(app)
+    csrf.init_app(app)
     apifairy.init_app(app)
 
     # incluir modulos y rutas

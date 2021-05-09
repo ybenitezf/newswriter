@@ -16,6 +16,7 @@ class RoleCreateForm(FlaskForm):
 class RoleDeleteForm(FlaskForm):
     submit = SubmitField('Eliminar rol')
 
+
 class RevokeRoleForm(FlaskForm):
     submit = SubmitField('Quitar del grupo')
 
