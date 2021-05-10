@@ -2,7 +2,7 @@ import { Controller } from "stimulus";
 
 export default class extends Controller {
 
-    static targets = [ "removelink" ]
+    static targets = ["removelink"]
     static values = {
         csrf: String
     }
@@ -14,11 +14,11 @@ export default class extends Controller {
             var form = new FormData()
             form.append("csrf_token", this.csrfValue)
 
-            fetch( this.removelinkTarget, {
+            fetch(this.removelinkTarget, {
                 method: "POST",
                 body: form
             }).then(res => {
-                if ( res.ok ) {
+                if (res.ok) {
                     res.json().then(data => {
                         this.element.classList.add('hide')
                         M.toast({
