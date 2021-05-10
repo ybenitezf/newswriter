@@ -7,7 +7,7 @@ export default class extends Controller {
     }
 
     disconnect() {
-        if ( this.instance ) {
+        if (this.instance) {
             this.instance.destroy();
         }
     }
