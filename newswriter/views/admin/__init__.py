@@ -3,14 +3,45 @@ from newswriter.models.security import Role, User
 from newswriter.views.admin.roles import AddMememberForm, RoleDiced
 from newswriter.views.admin.roles import RevokeRoleForm
 from newswriter.views.admin.permissions import PermissionDiced
-from flask.helpers import url_for
-from flask import Blueprint, redirect, flash, render_template
+from newswriter.views.admin.boards import BoardDiced
+from newswriter.permissions import admin_perm
+from flask_menu import current_menu, register_menu
+from flask_menu.classy import classy_menu_item
+from flask_classful import FlaskView
+from flask import Blueprint, redirect, flash, render_template, url_for
 
 
+# just a container for redirect to the concrete blueprints
+admin_page = Blueprint('admin_models', __name__, url_prefix='/admin')
 admin_role = Blueprint('admin_role', __name__, url_prefix='/admin/role')
-admin_permissions = Blueprint('admin_perms', __name__, url_prefix='/admin/permission')
-RoleDiced().register(admin_role)
-PermissionDiced().register(admin_permissions)
+admin_permissions = Blueprint(
+    'admin_perms', __name__, url_prefix='/admin/permission')
+admin_boards = Blueprint('admin_boards', __name__, url_prefix='/admin/board')
+
+decorators = [admin_perm.require(http_exception=403)]
+
+RoleDiced(
+    detail_decorators=decorators,
+    index_decorators=decorators,
+    create_decorators=decorators,
+    edit_decorators=decorators,
+    delete_decorators=decorators
+).register(admin_role)
+PermissionDiced(
+    detail_decorators=decorators,
+    index_decorators=decorators,
+    create_decorators=decorators,
+    edit_decorators=decorators,
+    delete_decorators=decorators
+).register(admin_permissions)
+BoardDiced(
+    detail_decorators=decorators,
+    index_decorators=decorators,
+    create_decorators=decorators,
+    edit_decorators=decorators,
+    delete_decorators=decorators
+).register(admin_boards)
+
 
 
 @admin_role.route('/<role>/<member>/revoke', methods=['GET', 'POST'])
@@ -42,3 +73,38 @@ def add_member(pk):
         return redirect(url_for('.detail', pk=role.id))
 
     return render_template('role/addmember.html', **locals())
+
+
+# Just for the sake of having a menu entry for administrators
+class AdminLinks(FlaskView):
+    route_prefix = '/admin/'
+
+    @classy_menu_item(
+        "actions.admin.boards", "Boards", 
+        visible_when=lambda: admin_perm.can())
+    def admin_boards(self):
+        return redirect(url_for('admin_boards.index'))
+
+    @classy_menu_item(
+        "actions.admin.roles", "Roles",
+        visible_when=lambda: admin_perm.can())
+    def admin_roles(self):
+        return redirect(url_for('admin_role.index'))
+
+
+
+# @admin_page.route('/boards')
+# @register_menu(
+#     admin_page, "actions.admin.boards", "Boards",
+#     visible_when=lambda: admin_perm.can())
+# def admin_boards_link():
+#     # just redirect to the CRUD view
+#     return redirect(url_for('admin_boards.index'))
+
+# @admin_page.route('/roles')
+# @register_menu(
+#     admin_page, "actions.admin.roles", "Roles",
+#     visible_when=lambda: admin_perm.can()
+# )
+# def admin_roles_link():
+#     return redirect(url_for('admin_role.index'))

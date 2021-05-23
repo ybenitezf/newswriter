@@ -8,10 +8,10 @@ from flask_principal import Principal
 from flask_caching import Cache
 from flask_static_digest import FlaskStaticDigest
 from flask_menu import register_menu, Menu
+from flask_menu.classy import register_flaskview
 from flask_wtf import CSRFProtect
 from apifairy import APIFairy
 from flask_marshmallow import Marshmallow
-# from celery import Celery
 from flask import Flask, redirect
 from werkzeug.middleware.proxy_fix import ProxyFix
 import pathlib
@@ -99,10 +99,18 @@ def create_app(config='newswriter.config.Config'):
     csrf.init_app(app)
     apifairy.init_app(app)
 
+    # the dummy thing
+    @app.route("/")
+    @register_menu(app, '.', "Inicio")
+    def home():
+        """Registrar una raiz commun para los menus"""
+        return redirect(url_for('default.index'))
+
     # incluir modulos y rutas
     from newswriter.views.default import default
     from newswriter.views.users import users_bp
     from newswriter.views.admin import admin_role, admin_permissions
+    from newswriter.views.admin import admin_boards, AdminLinks
     from newswriter.searchcommands import cmd as search_cmd
     from newswriter.admin_commands import users_cmds
     from adelacommon.deploy import deploy_cmd
@@ -111,20 +119,16 @@ def create_app(config='newswriter.config.Config'):
     app.register_blueprint(default)
     app.register_blueprint(users_bp)
     # admin crud
+    AdminLinks.register(app)
+    register_flaskview(app, AdminLinks)
     app.register_blueprint(admin_role)
     app.register_blueprint(admin_permissions)
+    app.register_blueprint(admin_boards)
     # --
     app.register_blueprint(search_cmd)
     app.register_blueprint(users_cmds)
     app.register_blueprint(deploy_cmd)
     login_mgr.login_view = 'users.login'
-
-    # the dummy thing
-    @app.route("/")
-    @register_menu(app, '.', "Inicio")
-    def home():
-        """Registrar una raiz commun para los menus"""
-        return redirect(url_for('default.index'))
 
     @app.context_processor
     def inject_version():
@@ -144,6 +148,12 @@ def create_app(config='newswriter.config.Config'):
         actions._external_url = "#!"
         actions._endpoint = None
         actions._text = "NAVBAR"
+
+        # admin menu section
+        actions = m.submenu("actions.admin")
+        actions._text = "Administración"
+        actions._endpoint = None
+        actions._external_url = "#!"
 
     return app
 
