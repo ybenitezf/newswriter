@@ -118,7 +118,8 @@ export default class Photo {
         formData.append('archive', file);
         fetch(this.config.endpoints.byFile, {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: this.config.additionalRequestHeaders
         }).then(
             response => response.json()
         ).then(data => {

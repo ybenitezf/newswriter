@@ -9,7 +9,8 @@
   data-editor-imagefetchurl-value="{{ url_for('default.fetch_image') }}"
   data-editor-linkendpoint-value="{{ url_for('default.fetch_link') }}"
   data-editor-photoupload-value="{{ url_for('default.upload_photoarchive') }}"
-  data-editor-attachupload-value="{{ url_for('default.upload_attach') }}">
+  data-editor-attachupload-value="{{ url_for('default.upload_attach') }}"
+  data-editor-csrf-value="{{ csrf_token() }}">
 
   <div class="row">
     <div class="input-field col s12">

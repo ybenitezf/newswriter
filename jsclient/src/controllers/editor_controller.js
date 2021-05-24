@@ -73,7 +73,8 @@ export default class EditorController extends Controller {
     imagefetchurl: String,
     photoupload: String,
     linkendpoint: String,
-    attachupload: String
+    attachupload: String,
+    csrf: String
   }
 
   initialize() {
@@ -144,6 +145,9 @@ export default class EditorController extends Controller {
             endpoints: {
               byFile: this.imageuploadValue,
               byUrl: this.imagefetchurlValue,
+            },
+            additionalRequestHeaders: {
+              "X-CSRFToken": this.csrfValue
             }
           }
         },
@@ -154,6 +158,9 @@ export default class EditorController extends Controller {
           config: {
             endpoints: {
               byFile: this.photouploadValue
+            },
+            additionalRequestHeaders: {
+              "X-CSRFToken": this.csrfValue
             }
           }
         },
@@ -294,6 +301,7 @@ export default class EditorController extends Controller {
     const apiUrl = this.apiendpointValue;
     this.disableGuardar();
     var keywords = [];
+    let csrf = this.csrfValue;
     M.Chips.getInstance(this.tagsTarget).chipsData.forEach((tagData) => {
       keywords.push(tagData.tag);
     })
@@ -309,7 +317,13 @@ export default class EditorController extends Controller {
       }
 
       if (this.validate(outData)) {
-        axios.post(apiUrl, outData).then(function (response) {
+        axios.post(
+          apiUrl, outData, {
+            headers: {
+              "X-CSRFToken": csrf
+            }
+          }
+        ).then(function (response) {
           M.toast({ html: 'Tus cambios han sido guardados', classes: 'rounded' })
         }).catch(function (error) {
           M.toast({
