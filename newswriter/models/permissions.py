@@ -26,6 +26,7 @@ BOARD_PERMS_DESCRIPTIONS = {
 ActualizarArticulosNeed = Need(ACTUALIZAR_CONTENIDO, 'board')
 ListarArticulosNeed = Need(LISTAR_CONTENIDO, 'board')
 PonerArticulosNeed = Need(PONER_CONTENIDO, 'board')
+EnviarAritulosNeed = Need(ENVIAR_CONTENIDO, 'board')
 
 # Permisos concretos
 class ActualizarArticulosPermission(Permission):
@@ -43,12 +44,19 @@ class ListarArticulosPermission(Permission):
         super().__init__(need, AdminRolNeed, ListarArticulosNeed)
 
 class PonerArticulosPermission(Permission):
-    """Permiso para 'mover a' o 'importar a' un board"""
+    """Mover articulos a este board"""
 
     def __init__(self, board_name):
         need = ItemNeed(PONER_CONTENIDO, board_name, 'board')
         super().__init__(need, AdminRolNeed, PonerArticulosNeed)
 
+
+class EnviarArticulosPermission(Permission):
+    """Mover/sacar articulos desde este board a otro"""
+
+    def __init__(self, board_name):
+        need = ItemNeed(ENVIAR_CONTENIDO, board_name, 'board')
+        super().__init__(need, AdminRolNeed, EnviarAritulosNeed)
 
 class BoardPermissionHelpers(object):
 

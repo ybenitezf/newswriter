@@ -12,7 +12,6 @@ from flask import Blueprint, redirect, flash, render_template, url_for
 
 
 # just a container for redirect to the concrete blueprints
-admin_page = Blueprint('admin_models', __name__, url_prefix='/admin')
 admin_role = Blueprint('admin_role', __name__, url_prefix='/admin/role')
 admin_permissions = Blueprint(
     'admin_perms', __name__, url_prefix='/admin/permission')
@@ -77,7 +76,7 @@ def add_member(pk):
 
 # Just for the sake of having a menu entry for administrators
 class AdminLinks(FlaskView):
-    route_prefix = '/admin/'
+    route_base = '/admin'
 
     @classy_menu_item(
         "actions.admin.boards", "Boards", 
@@ -92,19 +91,3 @@ class AdminLinks(FlaskView):
         return redirect(url_for('admin_role.index'))
 
 
-
-# @admin_page.route('/boards')
-# @register_menu(
-#     admin_page, "actions.admin.boards", "Boards",
-#     visible_when=lambda: admin_perm.can())
-# def admin_boards_link():
-#     # just redirect to the CRUD view
-#     return redirect(url_for('admin_boards.index'))
-
-# @admin_page.route('/roles')
-# @register_menu(
-#     admin_page, "actions.admin.roles", "Roles",
-#     visible_when=lambda: admin_perm.can()
-# )
-# def admin_roles_link():
-#     return redirect(url_for('admin_role.index'))

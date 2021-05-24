@@ -1,4 +1,15 @@
-{% extends 'layout.html' %}
+{% if article %}
+  {% extends 'layout.html' if article.board.isPersonal() else 'layout_breadcrumbs.html' %}
+
+  {% block breadcrumbs %}
+  {{ super() }}
+  <a href="{{ url_for('.list_boards') }}" class="breadcrumb">Carpetas</a>
+  <a href="{{ url_for('.index', board_name=article.board.name) }}" class="breadcrumb">{{ article.board.name }}</a>
+  <a href="#!" class="breadcrumb">{{ article.headline }}</a>
+  {% endblock breadcrumbs %}
+{% else %}
+  {% extends 'layout.html' %}
+{% endif %}
 
 {% block page_title %}{{'Escribir - Redacción' if article is none else article.headline}}{% endblock %}
 
