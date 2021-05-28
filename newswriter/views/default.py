@@ -534,7 +534,9 @@ def articleEndPoint(pkid):
 
 
 @default.route('/boards')
-@register_menu(default, "actions.default.boards", "Carpetas")
+@register_menu(
+    default, "actions.default.boards", "Carpetas",
+    visible_when=lambda: current_app.config.get('PYINSTALLER', False) is False)
 def list_boards():
     """Lista de carpetas accesibles al usuario"""
 
@@ -606,6 +608,7 @@ def default_processors():
     return dict(
         renderBlock=renderBlock,
         imageResolver=imageResolver,
+        local_install=(current_app.config.get('PYINSTALLER', False) is True),
         ListarArticulosPermission=ListarArticulosPermission,
         PonerArticulosPermission=PonerArticulosPermission,
         ActualizarArticulosPermission=ActualizarArticulosPermission,

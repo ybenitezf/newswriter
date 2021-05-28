@@ -44,7 +44,7 @@
       {% endif %}
       <a href="{{ url_for('.preview', pkid=item.id) }}">Ver</a>
       <a href="{{ url_for('.download_article', pkid=item.id) }}" title="Descargar articulo">Exportar</a>
-      {% if EnviarArticulosPermission(board.name).can() %}
+      {% if EnviarArticulosPermission(board.name).can() and (local_install is false) %}
       <a href="{{ url_for('.move_article', artid=item.id) }}">Mover a ...</a>
       {% endif %}
     </div>
