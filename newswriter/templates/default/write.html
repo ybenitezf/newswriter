@@ -1,4 +1,15 @@
-{% extends 'layout.html' %}
+{% if article %}
+  {% extends 'layout.html' if article.board.isPersonal() else 'layout_breadcrumbs.html' %}
+
+  {% block breadcrumbs %}
+  {{ super() }}
+  <a href="{{ url_for('.list_boards') }}" class="breadcrumb">Carpetas</a>
+  <a href="{{ url_for('.index', board_name=article.board.name) }}" class="breadcrumb">{{ article.board.name }}</a>
+  <a href="#!" class="breadcrumb">{{ article.headline }}</a>
+  {% endblock breadcrumbs %}
+{% else %}
+  {% extends 'layout.html' %}
+{% endif %}
 
 {% block page_title %}{{'Escribir - Redacción' if article is none else article.headline}}{% endblock %}
 
@@ -9,7 +20,8 @@
   data-editor-imagefetchurl-value="{{ url_for('default.fetch_image') }}"
   data-editor-linkendpoint-value="{{ url_for('default.fetch_link') }}"
   data-editor-photoupload-value="{{ url_for('default.upload_photoarchive') }}"
-  data-editor-attachupload-value="{{ url_for('default.upload_attach') }}">
+  data-editor-attachupload-value="{{ url_for('default.upload_attach') }}"
+  data-editor-csrf-value="{{ csrf_token() }}">
 
   <div class="row">
     <div class="input-field col s12">

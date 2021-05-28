@@ -1,0 +1,9 @@
+{% extends 'layout_breadcrumbs.html' %}
+{% from "_formhelpers.html" import render_field %}
+{% from "_formhelpers.html" import render_select_field %}
+
+
+{% block breadcrumbs %}
+{{ super() }}
+<a href="{{ url_for('admin_role.index') }}" class="breadcrumb">Roles</a>
+{% endblock breadcrumbs %}

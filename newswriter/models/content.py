@@ -3,12 +3,18 @@ from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 from newswriter import db
 from newswriter.models import _gen_uuid
 from newswriter.models.security import User
+from flask_diced import persistence_methods
 from datetime import datetime
 import json
 
+
+@persistence_methods(db)
 class Board(db.Model):
     name = db.Column(db.String(60), primary_key=True)
     articles = db.relationship('Article', backref='board', lazy=True)
+
+    def isPersonal(self) -> bool:
+        return self.name.endswith('_ub')
 
     @classmethod
     def getUserBoard(cls, user: User) -> 'Board':

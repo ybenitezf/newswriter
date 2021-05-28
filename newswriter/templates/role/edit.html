@@ -1,0 +1,36 @@
+{% extends 'role/layout.html' %}
+
+{% block page_title %}
+  Administración - Roles - Editar
+{% endblock %}
+
+{% block breadcrumbs %}
+{{ super() }}
+<a href="{{ url_for('admin_role.edit', pk=role.id) }}" class="breadcrumb">Editar</a>
+{% endblock breadcrumbs %}
+
+{% block content %}
+{{ super() }}
+<div class="container">
+    <div class="row">
+        <h4 class="mb-5">Administración de Roles</h4>
+        <p>Editar rol "{{ role.name }}"</p>
+
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <div class="row"> {{ render_field(form.name, 's12') }} </div>
+            <div class="row"> {{ render_field(form.description, 's12') }} </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">
+                        Guardar
+                        <i class="material-icons left">save</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

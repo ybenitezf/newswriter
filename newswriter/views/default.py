@@ -3,9 +3,11 @@ from newswriter.modules.imagetools import handleImageUpload, handleURL
 from newswriter.models.content import Article, ImageModel, Board
 from newswriter.models.permissions import ListarArticulosPermission
 from newswriter.models.permissions import ActualizarArticulosPermission
+from newswriter.models.permissions import PonerArticulosPermission
+from newswriter.models.permissions import EnviarArticulosPermission
 from newswriter.models import _gen_uuid
 from newswriter.forms import UploadArticleForm
-from newswriter import filetools, db
+from newswriter import filetools, db, csrf
 from newswriter.modules.export import export_article
 from newswriter.modules.import_art import importItem, NotMetadataInFile
 from newswriter.modules.import_art import NewVersionExits, NoAccessToBoard
@@ -54,14 +56,15 @@ def index(board_name):
             flash(f"Usted no tiene acceso al board {board_name}")
             return redirect(url_for('.index'))
 
-
     articulos = Article.query.filter(
         Article.board_id == board.name).order_by(
             Article.created_on.desc()).paginate(page, per_page=4)
 
-
     return render_template(
-        'default/index.html', results=articulos)
+        'default/index.html',
+        results=articulos, board=board,
+        is_personal=("_ub" in board.name)
+    )
 
 
 @default.route('/escribir', defaults={"pkid": None})
@@ -99,7 +102,7 @@ def import_article():
 
         try:
             art = importItem(
-                fullname, current_app.config['UPLOAD_FOLDER'], 
+                fullname, current_app.config['UPLOAD_FOLDER'],
                 current_user)
             flash("Articulo importado")
             return redirect(url_for(".preview", pkid=art.id))
@@ -328,6 +331,7 @@ def upload_image():
 
 @default.route('/upload-attach', methods=['POST'])
 @login_required
+@csrf.exempt
 def upload_attach():
     """Editor.js AttachesTool backed"""
     # check if the post request has the file part
@@ -412,6 +416,7 @@ def fetch_image():
 
 @default.route('/fetch-link', methods=['GET'])
 @login_required
+@csrf.exempt
 def fetch_link():
     _l = current_app.logger
     if request.args.get('url'):
@@ -483,22 +488,27 @@ def articleEndPoint(pkid):
             }
 
     if request.method == 'POST':
+
         if article is None:
             # this is a new one and request.json['uuid'] is mandatory
             current_app.logger.debug("Creating a new Article")
-            article = Article(
-                id=pkid,
-                headline=request.json['headline'],
-                credit_line=request.json['creditline'],
-                excerpt=request.json['summary'],
-                content=json.dumps(request.json['content']),
-                author_id=current_user.id,
-                board_id=Board.getUserBoard(current_user).name,
-                modified_on=datetime.datetime.utcnow()
-            )
-            article.keywords = request.json['keywords']
-            db.session.add(article)
-            db.session.commit()
+            try:
+                article = Article(
+                    id=pkid,
+                    headline=request.json['headline'],
+                    credit_line=request.json['creditline'],
+                    excerpt=request.json['summary'],
+                    content=json.dumps(request.json['content']),
+                    author_id=current_user.id,
+                    board_id=Board.getUserBoard(current_user).name,
+                    modified_on=datetime.datetime.utcnow()
+                )
+                article.keywords = request.json['keywords']
+                db.session.add(article)
+                db.session.commit()
+            except Exception as e:
+                current_app.logger.exception("Malo")
+                raise e
 
             return {"success": 1}
         else:
@@ -523,6 +533,73 @@ def articleEndPoint(pkid):
     return {"success": 0}, 500
 
 
+@default.route('/boards')
+@register_menu(
+    default, "actions.default.boards", "Carpetas",
+    visible_when=lambda: current_app.config.get('PYINSTALLER', False) is False)
+def list_boards():
+    """Lista de carpetas accesibles al usuario"""
+
+    board_list = Board.query.all()
+    return render_template(
+        'default/boards.html',
+        board_list=board_list,  # all the boards
+        user_board=Board.getUserBoard(current_user)  # user board
+    )
+
+
+@default.route('/move/<artid>', defaults={'board_name': None})
+@default.route('/move/<artid>/<board_name>')
+def move_article(artid, board_name):
+    """Mover trabajo a otro board
+
+    artid: id del articulo a mover
+    board_name: board a donde mover el articulo
+    """
+    article = Article.query.get_or_404(artid)
+    source = article.board
+
+    if EnviarArticulosPermission(article.board.name).can() is False:
+        flash(f"Usted no puede sacar articules de {article.board.name}")
+        return redirect(url_for('.index'))
+
+    if board_name is not None:
+        target = Board.query.get_or_404(board_name)
+        if PonerArticulosPermission(target.name).can():
+            source.articles.remove(article)
+            target.articles.append(article)
+            db.session.add(source)
+            db.session.add(target)
+            db.session.add(article)
+            db.session.commit()
+
+            # send the user to te source board
+            flash(f"Articulo enviado a {target.name}")
+            if source == Board.getUserBoard(current_user):
+                return redirect(url_for('.index'))
+
+            return redirect(url_for('.index', board_name=source.name))
+        else:
+            flash(f"Usted no puede mover articulos a {target.name}")
+            return redirect(url_for('.index'))
+
+    boards = []
+    for b in Board.query.filter(Board.name != source.name).all():
+        if PonerArticulosPermission(b.name).can() and (b != Board.getUserBoard(current_user)):
+            boards.append(b)
+
+    if len(boards) == 0:
+        # no hay ningun board a donde enviar el articulo
+        flash("No puedes mover a ninguna carpeta")
+        if source == Board.getUserBoard(current_user):
+            return redirect(url_for('.index'))
+
+        return redirect(url_for('.index', board_name=source.name))
+
+    return render_template(
+        'default/move_article.html', board_list=boards, article=article)
+
+
 @default.context_processor
 def default_processors():
     def imageResolver(id):
@@ -530,4 +607,10 @@ def default_processors():
 
     return dict(
         renderBlock=renderBlock,
-        imageResolver=imageResolver)
+        imageResolver=imageResolver,
+        local_install=(current_app.config.get('PYINSTALLER', False) is True),
+        ListarArticulosPermission=ListarArticulosPermission,
+        PonerArticulosPermission=PonerArticulosPermission,
+        ActualizarArticulosPermission=ActualizarArticulosPermission,
+        EnviarArticulosPermission=EnviarArticulosPermission
+    )

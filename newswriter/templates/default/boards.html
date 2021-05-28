@@ -1,0 +1,53 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}
+Carpetas/Boards disponibles
+{% endblock %}
+
+{% block content %}
+<h4>Carpetas/<em>Boards</em></h4>
+
+<div class="row">
+    <div class="col s12">
+      <div class="card-panel grey lighten-3">
+        <h4>
+            <a href="{{ url_for('default.index') }}">
+                Mis trabajos
+
+                <span class="badge blue white-text">
+                    {{ user_board.articles | length }}
+                </span>
+            </a>
+        </h4>
+      </div>
+    </div>
+</div>
+
+{% for board in board_list %}
+    {% if board.isPersonal() is false %}
+    <div class="row">
+        <div class="col s12">
+          <div class="card-panel">
+            <h4>
+                {% if ListarArticulosPermission(board.name).can() %}
+                <a href="{{ url_for('default.index', board_name=board.name) }}">
+                    {{ board.name }}
+
+                    <span class="badge blue white-text">
+                        {{ board.articles | length }}
+                    </span>
+                </a>
+                {% else %}
+                <a href="#!" class="grey-text text-darken-2">
+                    {{ board.name }}
+                </a>
+                {% endif %}
+            </h4>
+          </div>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+
+
+{% endblock %}

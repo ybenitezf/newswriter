@@ -1,0 +1,54 @@
+{% extends 'role/layout.html' %}
+
+{% block page_title %}
+Roles - {{ role.name }}
+{% endblock %}
+
+{% block breadcrumbs %}
+{{ super() }}
+<a href="{{ url_for('admin_role.detail', pk=role.id) }}" class="breadcrumb">Miembros</a>
+{% endblock breadcrumbs %}
+
+{% block content %}
+<h4>Rol {{ role.name }}</h4>
+
+<p>{{ role.description }}</p>
+
+<p>
+    <a  href="{{ url_for('.add_member', pk=role.id) }}" class="waves-effect waves-light btn" title="Agregar usuario">
+        <i class="material-icons left">person_add</i> Agregar
+    </a>
+</p>
+
+{% if role.users %}
+<table class="responsive-table">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for miembro in role.users %}
+        <tr>
+            <td>{{ miembro.username }}</td>
+            <td>{{ miembro.name }}</td>
+            <td>{{ miembro.email or 'N/D' }}</td>
+            <td>
+                <a  href="{{ url_for('.role_revoke', role=role.id, member=miembro.id) }}" class="waves-effect waves-light btn-small red" title="Eliminar">
+                    <i class="material-icons">delete</i>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="card-panel mt-5">
+    <h4 class="center-align">No hay usuarios con este rol asignado</h4>
+</div>
+{% endif %}
+
+{% endblock %}

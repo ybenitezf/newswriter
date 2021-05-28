@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
-  <title>{% block page_title %}Title{% endblock %} - Redacción</title>
+  <title>{% block page_title %}Title{% endblock %} - NewsWriter</title>
 
   <!-- CSS  -->
   <link href="{{ static_url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet"
@@ -29,17 +29,19 @@
               </a>
             </li>
           </ul>
-          <a href="{{ url_for('default.index') }}" class="brand-logo center">Redacción</a>
+          <a href="{{ url_for('default.index') }}" class="brand-logo center">NewsWriter</a>
         </div>
       </nav>
     </div>
+
+    {% block page_header %}{% endblock page_header %}
   </header>
 
   <main>
     <ul id="slide-out" class="sidenav">
       {% block sidebar %}
       {% for section in current_menu.submenu("actions").children %}
-      {% if section.children %}
+      {% if section.children and section.has_visible_child() %}
       <li><a class="subheader">{{ section.text }}</a></li>
         {% for item in section.children %}
         {% if item.visible: %}

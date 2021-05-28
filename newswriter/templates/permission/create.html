@@ -1,0 +1,47 @@
+{% extends 'permission/layout.html' %}
+
+{% block page_title %}Adminstración de permisos{% endblock %}
+
+{% block breadcrumbs %}
+{{ super() }}
+<a href="{{ url_for('admin_perms.index', role_id=role.id) }}" class="breadcrumb">Permisos - {{role.name}}</a>
+<a href="{{ url_for('admin_perms.create', role_id=role.id) }}" class="breadcrumb">ASignación de permisos</a>
+{% endblock breadcrumbs %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h4 class="mb-5">Administración de Roles</h4>
+        <p>Asignar permiso para el rol {{ role.name }}</p>
+
+        <form action="" method="post">
+            {{ form.csrf_token }}
+            {{ form.role_id(value=role.id) }}
+            <div class="row"> {{ render_select_field(form.name, 's12') }} </div>
+            <div class="row"> {{ render_select_field(form.model_name, 's12') }} </div>
+            <div class="row"> {{ render_field(form.record_id, 's12') }} </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">
+                        Asignar
+                        <i class="material-icons left">send</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
+
+
+{% block page_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems, {});
+        M.updateTextFields();
+      });
+</script>
+{% endblock %}

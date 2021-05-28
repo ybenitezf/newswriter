@@ -1,0 +1,57 @@
+{% extends 'permission/layout.html' %}
+
+{% block page_title %}Adminstración de permisos{% endblock %}
+
+{% block breadcrumbs %}
+{{ super() }}
+<a href="{{ url_for('admin_perms.index', role_id=role.id) }}" class="breadcrumb">Permisos - {{role.name}}</a>
+{% endblock breadcrumbs %}
+
+{% block content %}
+<h4>Listado de permisos para {{ role.name }}</h4>
+
+<p>
+    <a class="waves-effect waves-light btn" href="{{ url_for('admin_perms.create', role_id=role.id) }}"
+        title="Agregar permiso">
+        <i class="material-icons left">add</i>
+        Permiso
+    </a>
+</p>
+
+
+<table class="striped">
+    <thead>
+        <tr>
+            <th>Permiso</th>
+            <th>Modelo</th>
+            <th>Objeto</th>
+            <!-- operaciones -->
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in permission_list %}
+        <tr data-controller="permrow" data-permrow-csrf-value="{{ csrf_token() }}">
+            <td>{{ get_permission_label(p.name) }}</td>
+            <td>{{ p.model_name }}</td>
+            <td>{{ p.record_id }}</td>
+            <td>
+                <a data-permrow-target="removelink" href="{{ url_for('admin_perms.delete', pk=p.id) }}"
+                    class="waves-effect waves-light btn-small red" title="Revocar permiso"
+                    data-action="click->permrow#delete">
+                    <i class="material-icons">delete</i>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p>
+    <a class="waves-effect waves-light btn" href="{{ url_for('admin_perms.create', role_id=role.id) }}"
+        title="Agregar permiso">
+        <i class="material-icons left">add</i>
+        Permiso
+    </a>
+</p>
+{% endblock %}

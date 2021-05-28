@@ -9,3 +9,15 @@
         {% endif %}
     </div>
 {% endmacro %}
+
+{% macro render_select_field(field, colspan) %}
+    <div class="col {{ colspan|safe }} input-field">
+        {{ field(**kwargs)|safe }}
+        {{ field.label }}
+        {% if field.errors %}
+        {% for error in field.errors %}
+          <p class="red-text text-darken-4">{{ error }}</p>
+        {% endfor %}
+        {% endif %}
+    </div>
+{% endmacro %}

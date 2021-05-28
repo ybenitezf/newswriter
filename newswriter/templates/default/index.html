@@ -1,8 +1,27 @@
-{% extends 'layout.html' %}
+{% if not board.isPersonal() %}
+  {% extends 'layout_breadcrumbs.html' %}
 
-{% block page_title %}Mis trabajos{% endblock %}
+  {% block breadcrumbs %}
+  {{ super() }}
+  <a href="{{ url_for('.list_boards') }}" class="breadcrumb">Carpetas</a>
+  <a href="#!" class="breadcrumb">{{ board.name }}</a>
+  {% endblock breadcrumbs %}
+{% else %}
+  {% extends 'layout.html' %}
+{% endif %}
+
+{% block page_title %}
+  {% if is_personal %}Mis trabajos{% else %}Newswriter - {{ board.name }}{% endif %}
+{% endblock %}
 
 {% block content %}
+
+{% if not is_personal %}
+  <h4><i class="material-icons">dashboard</i> {{ board.name }}</h4>
+{% else %}
+  <h4><i class="material-icons">dashboard</i> Mis trabajos</h4>
+{% endif %}
+
 <div class="works-list">
 
   {% if results.total > 0 %}
@@ -20,9 +39,14 @@
       </p>
     </div>
     <div class="card-action">
-      <a href="{{ url_for('default.write', pkid=item.id) }}">Editar</a>
+      {% if ActualizarArticulosPermission(board.name).can() %}
+        <a href="{{ url_for('default.write', pkid=item.id) }}">Editar</a>
+      {% endif %}
       <a href="{{ url_for('.preview', pkid=item.id) }}">Ver</a>
       <a href="{{ url_for('.download_article', pkid=item.id) }}" title="Descargar articulo">Exportar</a>
+      {% if EnviarArticulosPermission(board.name).can() and (local_install is false) %}
+      <a href="{{ url_for('.move_article', artid=item.id) }}">Mover a ...</a>
+      {% endif %}
     </div>
   </div>
   {% endfor %}

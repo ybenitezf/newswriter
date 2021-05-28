@@ -1,0 +1,31 @@
+{% extends 'role/layout.html' %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block page_title %}
+  Administración - Roles - Crear
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h4 class="mb-5">Administración de Roles</h4>
+        <p>Crear nuevo rol</p>
+
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <div class="row"> {{ render_field(form.name, 's12') }} </div>
+            <div class="row"> {{ render_field(form.description, 's12') }} </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">
+                        Crear
+                        <i class="material-icons left">send</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

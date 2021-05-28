@@ -1,0 +1,38 @@
+{% extends 'board/layout.html' %}
+
+
+{% block page_title %}
+Administración - Boards
+{% endblock %}
+
+{% block content %}
+<h4>Administración de Boards</h4>
+
+<a class="waves-effect waves-light btn" href="{{ url_for('admin_boards.create') }}">
+    <i class="material-icons left">add</i>
+    Crear Board
+</a>
+
+<table class="striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for board in board_list %}
+            {% if board.isPersonal() is false %}
+            <tr>
+                <td>{{ board.name }}</td>
+                <td></td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </tbody>
+</table>
+
+
+{% endblock %}

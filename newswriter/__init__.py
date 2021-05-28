@@ -8,9 +8,10 @@ from flask_principal import Principal
 from flask_caching import Cache
 from flask_static_digest import FlaskStaticDigest
 from flask_menu import register_menu, Menu
+from flask_menu.classy import register_flaskview
+from flask_wtf import CSRFProtect
 from apifairy import APIFairy
 from flask_marshmallow import Marshmallow
-# from celery import Celery
 from flask import Flask, redirect
 from werkzeug.middleware.proxy_fix import ProxyFix
 import pathlib
@@ -30,6 +31,7 @@ cache = Cache()
 flask_statics = FlaskStaticDigest()
 apifairy = APIFairy()
 ma = Marshmallow()
+csrf = CSRFProtect()
 # celery = Celery(__name__)
 # Breadcrumbs is a subclass of flask_menu.Menu
 menu = Menu()
@@ -39,17 +41,14 @@ def create_app(config='newswriter.config.Config'):
     """Inicializar la aplicación"""
     if getattr(sys, 'frozen', False):
         # para pyinstaller
-        # template_folder = os.path.join(sys._MEIPASS, 'templates')
-        # static_folder = os.path.join(sys._MEIPASS, 'static')
         instance_path = os.path.join(os.path.expanduser("~"), "newswriter")
         app = Flask(
             __name__, 
-            # template_folder=template_folder,
-            # static_folder=static_folder, 
             instance_path=instance_path)
         app.config['PYINSTALLER'] = True
     else:
         app = Flask(__name__)
+        app.config['PYINSTALLER'] = False
     app.config.from_object(config)
     if os.getenv('APP_CONFIG') and (not app.config.get('TESTING')):
         app.config.from_object(os.getenv('APP_CONFIG'))
@@ -98,24 +97,8 @@ def create_app(config='newswriter.config.Config'):
     flask_statics.init_app(app)
     ma.init_app(app)
     menu.init_app(app)
+    csrf.init_app(app)
     apifairy.init_app(app)
-    # if app.config.get('CELERY_ENABLED'):
-    #     init_celery(celery, app)
-
-    # incluir modulos y rutas
-    from newswriter.views.default import default
-    from newswriter.views.users import users_bp
-    from newswriter.searchcommands import cmd as search_cmd
-    from newswriter.admin_commands import users_cmds
-    from adelacommon.deploy import deploy_cmd
-
-    # registrar los blueprints
-    app.register_blueprint(default)
-    app.register_blueprint(users_bp)
-    app.register_blueprint(search_cmd)
-    app.register_blueprint(users_cmds)
-    app.register_blueprint(deploy_cmd)
-    login_mgr.login_view = 'users.login'
 
     # the dummy thing
     @app.route("/")
@@ -123,6 +106,30 @@ def create_app(config='newswriter.config.Config'):
     def home():
         """Registrar una raiz commun para los menus"""
         return redirect(url_for('default.index'))
+
+    # incluir modulos y rutas
+    from newswriter.views.default import default
+    from newswriter.views.users import users_bp
+    from newswriter.views.admin import admin_role, admin_permissions
+    from newswriter.views.admin import admin_boards, AdminLinks
+    from newswriter.searchcommands import cmd as search_cmd
+    from newswriter.admin_commands import users_cmds
+    from adelacommon.deploy import deploy_cmd
+
+    # registrar los blueprints
+    app.register_blueprint(default)
+    app.register_blueprint(users_bp)
+    # admin crud
+    AdminLinks.register(app)
+    register_flaskview(app, AdminLinks)
+    app.register_blueprint(admin_role)
+    app.register_blueprint(admin_permissions)
+    app.register_blueprint(admin_boards)
+    # --
+    app.register_blueprint(search_cmd)
+    app.register_blueprint(users_cmds)
+    app.register_blueprint(deploy_cmd)
+    login_mgr.login_view = 'users.login'
 
     @app.context_processor
     def inject_version():
@@ -143,15 +150,11 @@ def create_app(config='newswriter.config.Config'):
         actions._endpoint = None
         actions._text = "NAVBAR"
 
+        # admin menu section
+        actions = m.submenu("actions.admin")
+        actions._text = "Administración"
+        actions._endpoint = None
+        actions._external_url = "#!"
+
     return app
 
-
-# def init_celery(instance, app):
-#     instance.conf.update(app.config)
-
-#     class ContextTask(instance.Task):
-#         def __call__(self, *args, **kwargs):
-#             with app.app_context():
-#                 return self.run(*args, **kwargs)
-
-#     instance.Task = ContextTask

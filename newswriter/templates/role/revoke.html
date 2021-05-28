@@ -1,0 +1,35 @@
+{% extends 'role/layout.html' %}
+
+{% block page_title %}
+Roles - Quitar miembro
+{% endblock %}
+
+{% block breadcrumbs %}
+{{ super() }}
+<a href="{{ url_for('.detail', pk=role_obj.id) }}" class="breadcrumb">Miembros</a>
+<a href="{{ url_for('admin_role.delete', pk=role_obj.id) }}" class="breadcrumb">Revocar</a>
+{% endblock breadcrumbs %}
+
+{% block content %}
+{{ super() }}
+<div class="container">
+    <div class="row">
+        <h4 class="mb-5">Administración de Roles</h4>
+        <p>¿Esta seguro que quiere <strong>ELIMINAR</strong> la membresia en el rol "{{ role_obj.name }}" a {{ user.name }}?</p>
+
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="input-field col s12">
+                    <button class="btn red waves-effect waves-light" type="submit" name="action">
+                        Eliminar
+                        <i class="material-icons left">delete</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

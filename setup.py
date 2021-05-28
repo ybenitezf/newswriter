@@ -43,6 +43,7 @@ setup(
         'Flask-Caching',
         'Flask-Static-Digest',
         'Flask-Diced',
+        'flask-classful',
         'Flask',
         'email-validator',
         'PyMySQL',

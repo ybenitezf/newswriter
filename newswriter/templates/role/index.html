@@ -1,0 +1,64 @@
+{% extends 'role/layout.html' %}
+
+{% block page_title %}
+Administración - Roles
+{% endblock %}
+
+{% block content %}
+<h4>Administración de Roles</h4>
+
+<a class="waves-effect waves-light btn" href="{{ url_for('admin_role.create') }}">
+    <i class="material-icons left">add</i>
+    Crear rol
+</a>
+
+<table class="striped">
+    <thead>
+        <tr>
+            <th>Rol</th>
+            <th>Descripción</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for role in role_list %}
+        <tr>
+            {% if role.isPersonal() %}
+            <td>{{ role.getUsername() }}</td>
+            {% else %}
+            <td>{{ role.name }}</td>
+            {% endif %}
+            <td>{{ role.description }}</td>
+            <td>
+                {% if role.isPersonal() is false %}
+                <a href="{{ url_for('admin_role.edit', pk=role.id) }}" class="waves-effect waves-light btn-small"
+                    title="Editar">
+                    <i class="material-icons">edit</i>
+                </a>
+                <a href="{{ url_for('admin_role.delete', pk=role.id) }}" class="waves-effect waves-light btn-small red"
+                    title="Eliminar">
+                    <i class="material-icons">delete</i>
+                </a>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{{ url_for('admin_perms.index', role_id=role.id) }}" class="waves-effect waves-light btn-small" title="Permisos">
+                    <i class="material-icons">security</i>
+                </a>
+                {% if role.isPersonal() is false %}
+                <a href="{{ url_for('admin_role.detail', pk=role.id) }}" class="waves-effect waves-light btn-small"
+                    title="Miembros">
+                    <i class="material-icons">people</i>
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </ul>
+    </tbody>
+</table>
+
+
+{% endblock %}
