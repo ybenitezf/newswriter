@@ -48,6 +48,7 @@ def create_app(config='newswriter.config.Config'):
         app.config['PYINSTALLER'] = True
     else:
         app = Flask(__name__)
+        app.config['PYINSTALLER'] = False
     app.config.from_object(config)
     if os.getenv('APP_CONFIG') and (not app.config.get('TESTING')):
         app.config.from_object(os.getenv('APP_CONFIG'))
